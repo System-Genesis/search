@@ -1,6 +1,15 @@
 import * as env from 'env-var';
 import './dotenv';
+import * as path from 'path';
+import * as fs from 'fs';
 
+const sslEnabled = env.get('ELASTICSEARCH_SSL_ENABLED').default('False').asBool();
+const rejectUnauthorized = env.get('ELASTICSEARCH_SSL_REJECT_UNAUTHORIZED').default('False').asBool();
+const caPath = env.get('ELASTICSEARCH_SSL_CA_FILE_PATH').default('').asString();
+const certPath = env.get('ELASTICSEARCH_SSL_KEY_CERT_PATH').default('').asString();
+const keyPath = env.get('ELASTICSEARCH_SSL_KEY_FILE_PATH').default('').asString();
+const pfxPath = env.get('ELASTICSEARCH_SSL_PFX_FILE_PATH').default('').asString();
+const passphrase = env.get('ELASTICSEARCH_SSL_PASSPHRASE').default('').asString();
 const config = {
     service: {
         port: env.get('PORT').required().asPortNumber(),
@@ -13,22 +22,24 @@ const config = {
             password: env.get('ELASTICSEARCH_PASSWORD').required().asString(),
         },
         ssl: {
-            enabled: env.get('ELASTICSEARCH_SSL_ENABLED').default('False').asBool(),
-            reject_unAuthorized: env.get('ELASTICSEARCH_SSL_REJECT_UNAUTHORIZED').default('False').asBool(),
-            cert: env.get('ELASTICSEARCH_CERTIFICATE_FILE_PATH').default('').asString(),
-            key: env.get('ELASTICSEARCH_KEY_FILE_PATH').default('').asString(),
-            pfx: env.get('ELASTICSEARCH_SSL_PFX_FILE_PATH').default('').asString(),
-            passphrase: env.get('ELASTICSEARCH_SSL_PASSPHRASE').default('').asString(),
+            enabled: sslEnabled,
+            reject_unAuthorized: rejectUnauthorized,
+            ca: sslEnabled && rejectUnauthorized && caPath !== '' ? fs.readFileSync(path.resolve(caPath)) : null,
+            cert: sslEnabled && certPath !== '' && keyPath !== '' ? fs.readFileSync(path.resolve(certPath)) : null,
+            key: sslEnabled && certPath !== '' && keyPath !== '' ? fs.readFileSync(path.resolve(keyPath)) : null,
+            pfx: sslEnabled && pfxPath !== '' ? fs.readFileSync(path.resolve(pfxPath)) : null,
+            passphrase: sslEnabled && passphrase !== '' ? passphrase : null,
             disableServerIdentityCheck: env.get('ELASTICSEARCH_SSL_DISABLE_SERVER_IDENTITY_CHECK').default('True').asBool(),
         },
         indexNames: {
-            persons: 'kartoffel.people',
-            organizationGroups: 'kartoffel.organizationgroups',
-            roles: 'kartoffel.roles',
-            domainUsers: 'kartoffel.domainUsers',
+            entities: 'kartoffelMS.entities',
+            organizationGroups: 'kartoffelMS.organizationgroups',
+            roles: 'kartoffelMS.roles',
+            digitalIdentities: 'kartoffelMS.digitalIdentities',
         },
         defaultResultLimit: 20,
         fullTextFieldMinLength: 2,
+        fullTextFieldName: 'autocomplete',
     },
     mongo: {
         uri: env.get('MONGO_URI').required().asUrlString(),
