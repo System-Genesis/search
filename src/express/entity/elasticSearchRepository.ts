@@ -1,3 +1,6 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-return-await */
 import { Client } from '@elastic/elasticsearch';
 import config from '../../config';
 import { ElasticSearchBaseRepository, QueryConfig } from '../../elasticsearch/elasticSearchBaseRepository';
@@ -6,7 +9,7 @@ import { IEntity, ProfilePictureMeta } from './interface';
 import { EntityFilters, EntityTextSearch } from './textSearchInterface';
 import { buildQuery } from '../../elasticsearch/index';
 
-type EntitySource = Omit<IEntity, 'pictures'> & {
+export type EntitySource = Omit<IEntity, 'pictures'> & {
     hierarchyPath: string;
     pictures?: {
         profile?: {
@@ -28,6 +31,16 @@ class ElasticEntityRepository extends ElasticSearchBaseRepository<EntitySource> 
     async searchByFullName(fullName: string, filters?: Partial<EntityFilters>) {
         // eslint-disable-next-line no-return-await
         return await this.search(buildQuery(fullName, filters));
+    }
+
+    async insertElastic(entity: EntitySource | EntitySource[]): Promise<void> {
+        if (!Array.isArray(entity)) {
+            await this.insert(entity, entity.id);
+        } else {
+            for (let index = 0; index < entity.length; index++) {
+                await this.insert(entity[index], entity[index].id);
+            }
+        }
     }
 
     // private transformPersonResult(person: EntitySource): IEntity {

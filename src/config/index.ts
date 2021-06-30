@@ -3,8 +3,8 @@ import './dotenv';
 import * as path from 'path';
 import * as fs from 'fs';
 
-const sslEnabled = env.get('ELASTICSEARCH_SSL_ENABLED').default('False').asBool();
-const rejectUnauthorized = env.get('ELASTICSEARCH_SSL_REJECT_UNAUTHORIZED').default('False').asBool();
+const sslEnabled = env.get('ELASTICSEARCH_SSL_ENABLED').default('false').asString().toLowerCase() === 'true';
+const rejectUnauthorized = env.get('ELASTICSEARCH_SSL_REJECT_UNAUTHORIZED').default('false').asString().toLowerCase() === 'true';
 const caPath = env.get('ELASTICSEARCH_SSL_CA_FILE_PATH').default('').asString();
 const certPath = env.get('ELASTICSEARCH_SSL_KEY_CERT_PATH').default('').asString();
 const keyPath = env.get('ELASTICSEARCH_SSL_KEY_FILE_PATH').default('').asString();
@@ -18,8 +18,8 @@ const config = {
         indexInitRetries: 3,
         nodes: env.get('ELASTICSEARCH_HOSTS').required().asString().split(','),
         auth: {
-            username: env.get('ELASTICSEARCH_USERNAME').required().asString(),
-            password: env.get('ELASTICSEARCH_PASSWORD').required().asString(),
+            username: env.get('ELASTICSEARCH_USERNAME').default('').asString(),
+            password: env.get('ELASTICSEARCH_PASSWORD').default('').asString(),
         },
         ssl: {
             enabled: sslEnabled,
@@ -29,13 +29,14 @@ const config = {
             key: sslEnabled && certPath !== '' && keyPath !== '' ? fs.readFileSync(path.resolve(keyPath)) : null,
             pfx: sslEnabled && pfxPath !== '' ? fs.readFileSync(path.resolve(pfxPath)) : null,
             passphrase: sslEnabled && passphrase !== '' ? passphrase : null,
-            disableServerIdentityCheck: env.get('ELASTICSEARCH_SSL_DISABLE_SERVER_IDENTITY_CHECK').default('True').asBool(),
+            disableServerIdentityCheck:
+                env.get('ELASTICSEARCH_SSL_DISABLE_SERVER_IDENTITY_CHECK').default('true').asString().toLowerCase() === 'true',
         },
         indexNames: {
-            entities: 'kartoffelMS.entities',
-            organizationGroups: 'kartoffelMS.organizationgroups',
-            roles: 'kartoffelMS.roles',
-            digitalIdentities: 'kartoffelMS.digitalIdentities',
+            entities: 'kartoffelms.entities',
+            organizationGroups: 'kartoffelms.organizationgroups',
+            roles: 'kartoffelms.roles',
+            digitalIdentities: 'kartoffelms.digitalidentities',
         },
         defaultResultLimit: 20,
         fullTextFieldMinLength: 2,

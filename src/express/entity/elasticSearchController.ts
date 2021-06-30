@@ -2,11 +2,16 @@ import { Response, Request } from 'express';
 import ElasticEntityRepository from './elasticSearchRepository';
 import { IEntity } from './interface';
 import { EntityFilters } from './textSearchInterface';
+import { extractEntityFiltersQuery } from '../../utils/middlwareHelpers';
 
 export class ElasticEntityController {
     static async searchByFullname(req: Request, res: Response) {
-        const na: Partial<EntityFilters> = {};
-        const response = await ElasticEntityRepository.searchByFullName(req.query?.fullName?.toString() || '', na);
+        const reqFilters = req.query;
+        const fullName: string = req.query!.fullName!.toString();
+        delete reqFilters.fullName;
+        const filteredObject: Partial<EntityFilters> = extractEntityFiltersQuery(reqFilters);
+        console.log(filteredObject);
+        const response = await ElasticEntityRepository.searchByFullName(fullName, filteredObject);
         res.json(response);
     }
 
@@ -16,6 +21,12 @@ export class ElasticEntityController {
             throw new Error(`Cannot find entity with ID: ${entityId}`);
         }
         return entity;
+    }
+
+    static async postEntityElastic(req: Request, res: Response) {
+        // console.log(req.body);
+        await ElasticEntityRepository.insertElastic(req.body);
+        res.json('added successfully');
     }
 }
 

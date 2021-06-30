@@ -1,9 +1,11 @@
 import { Router } from 'express';
-import featureRouter from './feature/router';
+import entityRouter from './entity/router';
+import groupRouter from './group/router';
 
 const appRouter = Router();
 
-appRouter.use('/api', featureRouter);
+appRouter.use('/api/entity', entityRouter);
+appRouter.use('/api/organizationGroup', groupRouter);
 
 appRouter.use('/isAlive', (_req, res) => {
     res.status(200).send('alive');

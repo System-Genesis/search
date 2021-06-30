@@ -117,7 +117,60 @@ const entityMappings = {
             type: 'date',
         },
         digitalIdentities: {
-            enabled: false,
+            properties: {
+                type: {
+                    type: 'keyword',
+                },
+                source: {
+                    type: 'keyword',
+                },
+                mail: {
+                    type: 'keyword',
+                },
+                uniqueId: {
+                    type: 'keyword',
+                },
+                entityId: {
+                    type: 'keyword',
+                },
+                createdAt: {
+                    type: 'date',
+                },
+                updatedAt: {
+                    type: 'date',
+                },
+                isRoleAttachable: {
+                    type: 'boolean',
+                },
+                role: {
+                    properties: {
+                        roleId: {
+                            enabled: false,
+                        },
+                        jobTitle: {
+                            enabled: false,
+                        },
+                        directGroup: {
+                            enabled: false,
+                        },
+                        hierarchy: {
+                            enabled: false,
+                        },
+                        hierarchyIds: {
+                            enabled: false,
+                        },
+                        source: {
+                            enabled: false,
+                        },
+                        createdAt: {
+                            enabled: false,
+                        },
+                        updatedAt: {
+                            enabled: false,
+                        },
+                    },
+                },
+            },
         },
     },
 };

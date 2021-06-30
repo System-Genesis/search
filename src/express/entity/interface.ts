@@ -21,7 +21,7 @@ export type SetProfilePictureDTO = Omit<ProfilePictureMeta, 'updatedAt'> & {
 };
 
 export interface IEntity {
-    id?: string | Types.ObjectId;
+    id: string;
     displayName?: string;
     entityType?: string;
     identityCard?: string;

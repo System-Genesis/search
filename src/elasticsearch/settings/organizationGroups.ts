@@ -47,6 +47,9 @@ const mappingsOG = {
         ancestors: {
             type: 'keyword',
         },
+        status: {
+            type: 'keyword',
+        },
         isLeaf: {
             type: 'boolean',
         },

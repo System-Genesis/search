@@ -1,9 +1,8 @@
-import { Types } from 'mongoose';
 import { IEntity } from '../entity/interface';
 import { IRole } from '../role/interface';
 
 export interface IOrganizationGroup {
-    id?: string | Types.ObjectId;
+    id?: string;
     name: string;
     ancestors: string[];
     hierarchy: string;

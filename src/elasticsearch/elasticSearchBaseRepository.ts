@@ -78,6 +78,17 @@ export abstract class ElasticSearchBaseRepository<T> {
         return [];
     }
 
+    protected async insert(post: T, id: string): Promise<any> {
+        const res: ApiResponse<SearchResponse<T>> = await this._client.index({
+            index: this._indexName,
+
+            id,
+            body: post,
+        });
+        console.log(res);
+        return res;
+    }
+
     public async findById(id: any) {
         const res = await this._client.get({
             id,

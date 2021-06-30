@@ -2,8 +2,8 @@ import { ElasticSearchBaseRepository } from '../../elasticsearch/elasticSearchBa
 import { IDigitalIdentity } from './interface';
 
 export class ElasticDIRepository extends ElasticSearchBaseRepository<IDigitalIdentity> {
-    static async searchByFullName(fullName: string) {
-        return fullName;
+    static async searchByFullName(displayName: string) {
+        return displayName;
         //  return await ElasticDIRepostiory.searchByFullName(fullName);
     }
 }

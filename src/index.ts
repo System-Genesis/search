@@ -3,6 +3,7 @@ import * as mongoose from 'mongoose';
 import menash, { ConsumerMessage } from 'menashmq';
 import Server from './express/server';
 import config from './config';
+import { deleteElasticData, initElasticIndexes, readJsonAndWriteElastic } from './elasticsearch'; //
 
 const { mongo, rabbit, service } = config;
 
@@ -36,10 +37,15 @@ const initializeRabbit = async () => {
 };
 
 const main = async () => {
-    await initializeMongo();
+    const i = 0;
+    if (i !== 0) {
+        await initializeMongo();
 
-    await initializeRabbit();
-
+        await initializeRabbit();
+    }
+    await deleteElasticData();
+    await initElasticIndexes();
+    await readJsonAndWriteElastic(`${process.cwd()}/ogPopulate2.json`, config.elasticsearch.indexNames.organizationGroups);
     const server = new Server(service.port);
 
     await server.start();
