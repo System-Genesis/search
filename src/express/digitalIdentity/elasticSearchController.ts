@@ -1,9 +1,15 @@
 import { Response, Request } from 'express';
-import { ElasticDIRepository } from './elasticSearchRepository';
+import { extractDIFiltersQuery } from '../../utils/middlwareHelpers';
+import ElasticDIRepository from './elasticSearchRepository';
+import { DigitalIdentityFilters } from './textSearchInterface';
 
 export class ElasticDIController {
     static async searchByFullname(req: Request, res: Response) {
-        const response = await ElasticDIRepository.searchByFullName(req.body.fullName.toString());
+        const reqFilters = req.query;
+        const uniqueId: string = req.query!.uniqueId!.toString();
+        delete reqFilters.fullName;
+        const filteredObject: Partial<DigitalIdentityFilters> = extractDIFiltersQuery(reqFilters);
+        const response = await ElasticDIRepository.searchByFullName(uniqueId, filteredObject);
         res.json(response);
     }
 }

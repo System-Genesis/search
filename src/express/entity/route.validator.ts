@@ -31,7 +31,14 @@ export const EntitySchema = Joi.object({
 });
 
 export const getSearchRequestSchema = Joi.object({
-    query: { fullName: Joi.string().required().min(2).max(20), source: Joi.string().min(2).max(20) },
+    query: {
+        fullName: Joi.string().required().min(2).max(20),
+        source: Joi.string().min(2).max(20),
+        entityType: Joi.string(),
+        rank: Joi.string(),
+        responsibility: Joi.string(),
+        hierarchyPath: Joi.string(),
+    },
 });
 
 export const getPostRequestSchema = Joi.object({

@@ -1,8 +1,7 @@
-import { Types } from 'mongoose';
 import { IRole } from '../role/interface';
 
 export interface IDigitalIdentity {
-    id?: string | Types.ObjectId;
+    id?: string;
     type: string;
     source: string;
     mail: string;
@@ -11,5 +10,5 @@ export interface IDigitalIdentity {
     createdAt: Date;
     updatedAt: Date;
     isRoleAttachable: boolean;
-    role: IRole;
+    role?: IRole;
 }

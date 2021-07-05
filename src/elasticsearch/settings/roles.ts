@@ -1,7 +1,26 @@
+/* eslint-disable camelcase */
 import config from '../../config/index';
 import { IndexSettings } from './indexSettings';
 
-const settings = {};
+import { analyzers, tokenizers, prefix_autocomplete_field_settings } from './generalSettings';
+
+const { fullTextFieldName } = config.elasticsearch;
+const { autocomplete, autocomplete_search, path_hierarchy } = analyzers;
+const { edge_ngram_tokenizer, custom_path_hierarchy } = tokenizers;
+
+const settings = {
+    analysis: {
+        analyzer: {
+            autocomplete,
+            autocomplete_search,
+            path_hierarchy,
+        },
+        tokenizer: {
+            edge_ngram_tokenizer,
+            custom_path_hierarchy,
+        },
+    },
+};
 
 const roleMapping = {
     properties: {
@@ -10,12 +29,16 @@ const roleMapping = {
         },
         digitalIdentityUniqueId: {
             type: 'keyword',
+            fields: {
+                [fullTextFieldName]: prefix_autocomplete_field_settings,
+            },
         },
         directGroup: {
             type: 'keyword',
         },
         hierarchy: {
-            type: 'keyword',
+            type: 'text',
+            analyzer: 'path_hierarchy',
         },
         hierarchyIds: {
             type: 'keyword',

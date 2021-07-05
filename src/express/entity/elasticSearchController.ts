@@ -10,7 +10,6 @@ export class ElasticEntityController {
         const fullName: string = req.query!.fullName!.toString();
         delete reqFilters.fullName;
         const filteredObject: Partial<EntityFilters> = extractEntityFiltersQuery(reqFilters);
-        console.log(filteredObject);
         const response = await ElasticEntityRepository.searchByFullName(fullName, filteredObject);
         res.json(response);
     }

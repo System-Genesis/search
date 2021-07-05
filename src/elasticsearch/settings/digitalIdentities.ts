@@ -1,27 +1,25 @@
+/* eslint-disable camelcase */
 import config from '../../config/index';
 import { IndexSettings } from './indexSettings';
+import { analyzers, tokenizers, prefix_autocomplete_field_settings } from './generalSettings';
 
-export type DigitalIdentity = {
-    type: string;
-    source: string;
-    mail: string;
-    uniqueId: string;
-    entityId: string;
-    createdAt: Date;
-    updatedAt: Date;
-    isRoleAttachable: boolean;
-    // role: {
-    //     roleId: string;
-    //     jobTitle: string;
-    //     directGroup: string;
-    //     hierarchy: string;
-    //     hierarchyIds: string[];
-    //     source: string;
-    //     createdAt: Date;
-    //     updatedAt: Date;
-    // };
+const { fullTextFieldName } = config.elasticsearch;
+const { autocomplete, autocomplete_search, path_hierarchy } = analyzers;
+const { edge_ngram_tokenizer, custom_path_hierarchy } = tokenizers;
+
+const settings = {
+    analysis: {
+        analyzer: {
+            autocomplete,
+            autocomplete_search,
+            path_hierarchy,
+        },
+        tokenizer: {
+            edge_ngram_tokenizer,
+            custom_path_hierarchy,
+        },
+    },
 };
-const settings = {};
 
 const DImappings = {
     properties: {
@@ -36,6 +34,9 @@ const DImappings = {
         },
         uniqueId: {
             type: 'keyword',
+            fields: {
+                [fullTextFieldName]: prefix_autocomplete_field_settings,
+            },
         },
         entityId: {
             type: 'keyword',

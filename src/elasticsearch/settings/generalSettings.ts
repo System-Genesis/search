@@ -119,7 +119,7 @@ export const analyzers = {
         type: 'custom',
     },
     autocomplete_search: {
-        tokenizer: 'lowercase',
+        tokenizer: 'standard',
     },
     path_hierarchy: {
         tokenizer: 'custom_path_hierarchy',
