@@ -7,7 +7,7 @@ export class ElasticDIController {
     static async searchByFullname(req: Request, res: Response) {
         const reqFilters = req.query;
         const uniqueId: string = req.query!.uniqueId!.toString();
-        delete reqFilters.fullName;
+        delete reqFilters.uniqueId;
         const filteredObject: Partial<DigitalIdentityFilters> = extractDIFiltersQuery(reqFilters);
         const response = await ElasticDIRepository.searchByFullName(uniqueId, filteredObject);
         res.json(response);

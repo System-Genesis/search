@@ -45,9 +45,10 @@ const main = async () => {
     }
     await deleteElasticData();
     await initElasticIndexes();
-    await readJsonAndWriteElastic(`${process.cwd()}/populatedDB.json`, config.elasticsearch.indexNames.entities);
-    await readJsonAndWriteElastic(`${process.cwd()}/diPopulate2.json`, config.elasticsearch.indexNames.digitalIdentities);
-    await readJsonAndWriteElastic(`${process.cwd()}/ogPopulate2.json`, config.elasticsearch.indexNames.organizationGroups);
+    await readJsonAndWriteElastic(`${process.cwd()}/roles2.json`, config.elasticsearch.indexNames.roles, 'roleId');
+    await readJsonAndWriteElastic(`${process.cwd()}/populatedDB.json`, config.elasticsearch.indexNames.entities, 'id');
+    await readJsonAndWriteElastic(`${process.cwd()}/diPopulate2.json`, config.elasticsearch.indexNames.digitalIdentities, 'uniqueId');
+    await readJsonAndWriteElastic(`${process.cwd()}/ogPopulate2.json`, config.elasticsearch.indexNames.organizationGroups, 'id');
     const server = new Server(service.port);
 
     await server.start();

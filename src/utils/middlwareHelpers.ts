@@ -3,6 +3,7 @@
 import { DigitalIdentityFilters } from '../express/digitalIdentity/textSearchInterface';
 import { EntityFilters } from '../express/entity/textSearchInterface';
 import { GroupFilters } from '../express/group/textSearchInterface';
+import { RoleFilters } from '../express/role/textSearchInterface';
 
 export const extractEntityFiltersQuery = (filtersQuery: any): Partial<EntityFilters> => {
     let filters: Partial<EntityFilters> = {};
@@ -26,6 +27,14 @@ export const extractGroupFiltersQuery = (filtersQuery: any): Partial<GroupFilter
 
 export const extractDIFiltersQuery = (filtersQuery: any): Partial<DigitalIdentityFilters> => {
     let filters: Partial<DigitalIdentityFilters> = {};
+    for (const [key, value] of Object.entries(filtersQuery)) {
+        filters[key] = value;
+    }
+    return filters;
+};
+
+export const extractRoleFiltersQuery = (filtersQuery: any): Partial<RoleFilters> => {
+    let filters: Partial<RoleFilters> = {};
     for (const [key, value] of Object.entries(filtersQuery)) {
         filters[key] = value;
     }

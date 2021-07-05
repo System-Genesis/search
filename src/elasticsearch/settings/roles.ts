@@ -27,7 +27,7 @@ const roleMapping = {
         jobTitle: {
             type: 'keyword',
         },
-        digitalIdentityUniqueId: {
+        roleId: {
             type: 'keyword',
             fields: {
                 [fullTextFieldName]: prefix_autocomplete_field_settings,
