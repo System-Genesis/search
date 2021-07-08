@@ -1,12 +1,12 @@
 import { IDigitalIdentity } from './interface';
 
 export type DigitalIdentityFilters = Partial<{
-    type: string;
-    source: string;
+    type: string | string[];
+    source: string | string[];
     isRoleAttachable: boolean;
-    mail: string;
-    jobTitle: string;
-    entityId: string;
+    mail: string | string[];
+    jobTitle: string | string[];
+    entityId: string | string[];
 }>;
 
 export interface DigitalIdentityTextSearch {

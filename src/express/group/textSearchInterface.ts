@@ -6,7 +6,7 @@ export type GroupQuery = {
 };
 
 export type GroupFilters = {
-    underGroupId: string;
+    underGroupId: string | string[];
     isAlive: boolean;
 };
 

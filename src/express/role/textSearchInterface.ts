@@ -1,9 +1,9 @@
 import { IRole } from './interface';
 
 export type RoleFilters = {
-    jobTitle: string;
-    hierarchy: string;
-    source: string;
+    jobTitle: string | string[];
+    hierarchy: string | string[];
+    source: string | string[];
 };
 
 export interface RoleTextSearch {

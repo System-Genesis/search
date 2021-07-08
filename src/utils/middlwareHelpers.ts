@@ -4,9 +4,15 @@ import { DigitalIdentityFilters } from '../express/digitalIdentity/textSearchInt
 import { EntityFilters } from '../express/entity/textSearchInterface';
 import { GroupFilters } from '../express/group/textSearchInterface';
 import { RoleFilters } from '../express/role/textSearchInterface';
+import { RuleFilter } from '../types';
 
-export const extractEntityFiltersQuery = (filtersQuery: any): Partial<EntityFilters> => {
+export const extractEntityFiltersQuery = (filtersQuery: RuleFilter[]): Partial<EntityFilters> => {
+
     let filters: Partial<EntityFilters> = {};
+    for(const shit of filtersQuery){
+        shit.entityType
+    }
+
     for (const [key, value] of Object.entries(filtersQuery)) {
         if (key === 'source') {
             filters['digitalIdentities.source'] = value as string;
