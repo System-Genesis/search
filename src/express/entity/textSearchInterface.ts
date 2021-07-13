@@ -1,3 +1,4 @@
+import { FilterQueries } from '../../types';
 import { IEntity } from './interface';
 
 export type EntityFilters = Partial<{
@@ -27,5 +28,5 @@ export const entityMapFieldType: Map<string, Map<string, string>> = new Map<stri
 ]);
 
 export interface EntityTextSearch {
-    searchByFullName(fullName: string, filters?: Partial<EntityFilters>): Promise<IEntity[]>;
+    searchByFullName(fullName: string, filters?: FilterQueries<Partial<EntityFilters>>): Promise<IEntity[]>;
 }

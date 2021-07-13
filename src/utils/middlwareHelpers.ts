@@ -1,26 +1,25 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-restricted-syntax */
 import { DigitalIdentityFilters } from '../express/digitalIdentity/textSearchInterface';
-import { EntityFilters } from '../express/entity/textSearchInterface';
+import { EntityFilters, entityMapFieldType } from '../express/entity/textSearchInterface';
 import { GroupFilters } from '../express/group/textSearchInterface';
 import { RoleFilters } from '../express/role/textSearchInterface';
-import { RuleFilter } from '../types';
+import { RuleFilter, FilterQueries } from '../types';
 
-export const extractEntityFiltersQuery = (filtersQuery: RuleFilter[]): Partial<EntityFilters> => {
-
+export const extractEntityFiltersQuery = (filtersQuery: RuleFilter[], userQuery: RuleFilter[]): FilterQueries<Partial<EntityFilters>> => {
     let filters: Partial<EntityFilters> = {};
-    for(const shit of filtersQuery){
-        shit.entityType
+    let mustNotFilters: Partial<EntityFilters> = {};
+    for (const filterRule of filtersQuery) {
+        mustNotFilters[entityMapFieldType[filterRule.field][filterRule.entityType]] = (
+            mustNotFilters[entityMapFieldType[filterRule.field][filterRule.entityType]] as []
+        ).concat(filterRule.values as []);
     }
-
-    for (const [key, value] of Object.entries(filtersQuery)) {
-        if (key === 'source') {
-            filters['digitalIdentities.source'] = value as string;
-        } else {
-            filters[key] = value;
-        }
+    for (const filterRule of userQuery) {
+        filters[entityMapFieldType[filterRule.field][filterRule.entityType]] = (
+            filters[entityMapFieldType[filterRule.field][filterRule.entityType]] as []
+        ).concat(filterRule.values as []);
     }
-    return filters;
+    return { userFilters: filters, ruleFilters: mustNotFilters } as FilterQueries<Partial<EntityFilters>>;
 };
 
 export const extractGroupFiltersQuery = (filtersQuery: any): Partial<GroupFilters> => {

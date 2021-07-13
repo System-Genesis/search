@@ -1,13 +1,16 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
 
 import * as esb from 'elastic-builder';
 import * as fs from 'fs';
+import { generateKeyPairSync } from 'crypto';
 import indexes from './settings/index';
 import clientElastic from './elasticSearchClientConfiguration';
 import config from '../config';
 import { EntityFilters } from '../express/entity/textSearchInterface';
 import { DigitalIdentityFilters } from '../express/digitalIdentity/textSearchInterface';
 import { RoleFilters } from '../express/role/textSearchInterface';
+import { FilterQueries } from '../types';
 
 export async function initElasticIndexes() {
     // eslint-disable-next-line no-restricted-syntax
@@ -70,14 +73,17 @@ export async function readJsonAndWriteElastic(path: string, modelType: string, i
     }
 }
 
-export function buildQuery(displayName: string, filters?: Partial<EntityFilters>) {
+export function buildQuery(displayName: string, filters?: FilterQueries<Partial<EntityFilters>>) {
     const must: esb.Query[] = [];
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
+    const mustNot: esb.Query[] = [];
+
     const query = {
         displayName,
-        ...filters,
+        ...filters?.userFilters,
     };
+
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, val] of Object.entries(query)) {
         // DISPLAYNAME in if
@@ -90,6 +96,12 @@ export function buildQuery(displayName: string, filters?: Partial<EntityFilters>
             const termQuery = Array.isArray(val) ? esb.termsQuery(key, val) : esb.termQuery(key, val!.toString());
             filter.push(termQuery);
         }
+    }
+    for (const key in filters?.ruleFilters) {
+        const termQuery = Array.isArray(filters?.ruleFilters[key])
+            ? esb.termsQuery(key, filters?.ruleFilters[key])
+            : esb.termQuery(key, filters?.ruleFilters[key].toString());
+        mustNot.push(termQuery);
     }
     const requestBody = esb.requestBodySearch().query(esb.boolQuery().must(must).should(should).filter(filter)).toJSON();
     return requestBody;

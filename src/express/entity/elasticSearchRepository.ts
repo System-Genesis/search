@@ -8,6 +8,7 @@ import { ElasticSearchBaseRepository, QueryConfig } from '../../elasticsearch/el
 import { IEntity, ProfilePictureMeta } from './interface';
 import { EntityFilters, EntityTextSearch } from './textSearchInterface';
 import { buildQuery } from '../../elasticsearch/index';
+import { FilterQueries } from '../../types';
 
 export type EntitySource = Omit<IEntity, 'pictures'> & {
     hierarchyPath: string;
@@ -28,7 +29,7 @@ class ElasticEntityRepository extends ElasticSearchBaseRepository<EntitySource> 
         super(indexName, elasticClient, queryConfig);
     }
 
-    async searchByFullName(fullName: string, filters?: Partial<EntityFilters>) {
+    async searchByFullName(fullName: string, filters?: FilterQueries<Partial<EntityFilters>>) {
         // eslint-disable-next-line no-return-await
         return await this.search(buildQuery(fullName, filters));
     }
