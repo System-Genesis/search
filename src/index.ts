@@ -8,11 +8,7 @@ import { deleteElasticData, initElasticIndexes, readJsonAndWriteElastic } from '
 const { mongo, rabbit, service } = config;
 
 const initializeMongo = async () => {
-    console.log('Connecting to Mongo...');
-
     await mongoose.connect(mongo.uri, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true });
-
-    console.log('Mongo connection established');
 };
 
 const initializeRabbit = async () => {

@@ -85,7 +85,6 @@ export abstract class ElasticSearchBaseRepository<T> {
             id,
             body: post,
         });
-        console.log(res);
         return res;
     }
 

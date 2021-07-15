@@ -1,4 +1,5 @@
 import { Response, Request } from 'express';
+import * as qs from 'qs';
 import ElasticEntityRepository from './elasticSearchRepository';
 import { IEntity } from './interface';
 import { EntityFilters } from './textSearchInterface';
@@ -10,6 +11,13 @@ export class ElasticEntityController {
         const reqFilters = req.query;
         const fullName: string = req.query!.fullName!.toString();
         delete reqFilters.fullName;
+        if (typeof reqFilters.ruleFilters === 'string') {
+            reqFilters.ruleFilters = qs.parse(JSON.parse(JSON.stringify(reqFilters.ruleFilters.toString())));
+            console.log(reqFilters.ruleFilters);
+        }
+        if (typeof reqFilters.userFilters === 'string') {
+            reqFilters.userFilters = qs.parse(JSON.parse(JSON.stringify(reqFilters.userFilters.toString())));
+        }
         const filteredObject: FilterQueries<Partial<EntityFilters>> = extractEntityFiltersQuery(
             reqFilters.ruleFilters as RuleFilter[],
             reqFilters.userFilters as RuleFilter[],
@@ -27,7 +35,6 @@ export class ElasticEntityController {
     }
 
     static async postEntityElastic(req: Request, res: Response) {
-        // console.log(req.body);
         await ElasticEntityRepository.insertElastic(req.body);
         res.json('added successfully');
     }

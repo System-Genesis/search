@@ -5,6 +5,6 @@ export type RuleFilter = {
 };
 
 export type FilterQueries<T> = {
-    userFilters: Partial<T>;
-    ruleFilters: Partial<T>;
+    userFilters: T;
+    ruleFilters: T;
 };

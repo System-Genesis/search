@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --async-stack-traces ./dist/index.js",
     "dev": "npm run build && npm start",
-    "test": "jest --coverage",
+    "test": "jest",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "lint": "eslint . --ext .ts",
@@ -29,7 +29,9 @@
     "mongoose": "^5.10.7",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.7",
+    "qs": "^6.7.0",
     "query-string": "^7.0.0",
+    "supertest": "^6.1.3",
     "uuid": "^8.3.0"
   },
   "devDependencies": {

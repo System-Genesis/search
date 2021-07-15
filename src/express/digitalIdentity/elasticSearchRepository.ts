@@ -5,6 +5,7 @@ import config from '../../config';
 import { ElasticSearchBaseRepository, QueryConfig } from '../../elasticsearch/elasticSearchBaseRepository';
 import { IDigitalIdentity } from './interface';
 import { DigitalIdentityFilters, DigitalIdentityTextSearch } from './textSearchInterface';
+import { FilterQueries } from '../../types';
 
 const {
     indexNames: { digitalIdentities: _indexName },
@@ -15,7 +16,7 @@ export class ElasticDIRepository extends ElasticSearchBaseRepository<IDigitalIde
         super(indexName, elasticClient, queryConfig);
     }
 
-    async searchByFullName(uniqueId: string, filters?: Partial<DigitalIdentityFilters>) {
+    async searchByFullName(uniqueId: string, filters?: FilterQueries<Partial<DigitalIdentityFilters>>) {
         return await this.search(buildQueryDI(uniqueId, filters));
     }
 }

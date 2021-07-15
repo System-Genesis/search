@@ -3,7 +3,6 @@
 
 import * as esb from 'elastic-builder';
 import * as fs from 'fs';
-import { generateKeyPairSync } from 'crypto';
 import indexes from './settings/index';
 import clientElastic from './elasticSearchClientConfiguration';
 import config from '../config';
@@ -11,6 +10,7 @@ import { EntityFilters } from '../express/entity/textSearchInterface';
 import { DigitalIdentityFilters } from '../express/digitalIdentity/textSearchInterface';
 import { RoleFilters } from '../express/role/textSearchInterface';
 import { FilterQueries } from '../types';
+import { filterMustArr, filterMustNotArr } from '../utils/middlwareHelpers';
 
 export async function initElasticIndexes() {
     // eslint-disable-next-line no-restricted-syntax
@@ -87,72 +87,115 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, val] of Object.entries(query)) {
         // DISPLAYNAME in if
-        if (!!val && typeof val === 'string' && val.trim().length >= config.elasticsearch.fullTextFieldMinLength && key === 'displayName') {
+        if (!!val && typeof val === 'string') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
             const exactQuery = esb.matchQuery(textField, val).boost(1.2);
             should.push(exactQuery);
             must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
         } else {
-            const termQuery = Array.isArray(val) ? esb.termsQuery(key, val) : esb.termQuery(key, val!.toString());
+            const termQuery = Array.isArray(val) ? esb.termsQuery(key, val) : esb.termQuery(key, val!.toString()); // might hurt later
             filter.push(termQuery);
         }
     }
     for (const key in filters?.ruleFilters) {
-        const termQuery = Array.isArray(filters?.ruleFilters[key])
-            ? esb.termsQuery(key, filters?.ruleFilters[key])
-            : esb.termQuery(key, filters?.ruleFilters[key].toString());
-        mustNot.push(termQuery);
-    }
-    const requestBody = esb.requestBodySearch().query(esb.boolQuery().must(must).should(should).filter(filter)).toJSON();
-    return requestBody;
-}
-export const buildQueryDI = (uniqueId: string, filters?: Partial<DigitalIdentityFilters>) => {
-    const must: esb.Query[] = [];
-    const should: esb.Query[] = [];
-    const filter: esb.Query[] = [];
-    const query = {
-        uniqueId,
-        ...filters,
-    };
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [key, val] of Object.entries(query)) {
-        // uniqueid in if
-        if (!!val && typeof val === 'string' && val.trim().length >= config.elasticsearch.fullTextFieldMinLength && key === 'uniqueId') {
-            const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
-            const exactQuery = esb.matchQuery(textField, val).boost(1.2);
-            should.push(exactQuery);
-            must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
-        } else {
-            const termQuery = Array.isArray(val) ? esb.termsQuery(key, val) : esb.termQuery(key, val!.toString());
-            filter.push(termQuery);
+        if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
+            const termNotQuery = Array.isArray(filters?.ruleFilters[key])
+                ? esb.termsQuery(key, filterMustNotArr(filters!.ruleFilters[key]))
+                : esb.termQuery(key, filters?.ruleFilters[key].toString());
+            mustNot.push(termNotQuery);
+
+            const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
+            if (mustArr.length !== 0) {
+                const termQuery = esb.termsQuery(key, mustArr);
+                filter.push(termQuery);
+            }
         }
     }
-    const requestBody = esb.requestBodySearch().query(esb.boolQuery().must(must).should(should).filter(filter)).toJSON();
+    const requestBody = esb.requestBodySearch().query(esb.boolQuery().mustNot(mustNot).must(must).should(should).filter(filter)).toJSON();
     return requestBody;
-};
+}
 
-export function buildQueryRole(roleId: string, filters?: Partial<RoleFilters>) {
+export const buildQueryDI = (uniqueId: string, filters?: FilterQueries<Partial<DigitalIdentityFilters>>) => {
     const must: esb.Query[] = [];
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
+    const mustNot: esb.Query[] = [];
+
     const query = {
-        roleId,
-        ...filters,
+        uniqueId,
+        ...filters?.userFilters,
     };
+
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, val] of Object.entries(query)) {
         // DISPLAYNAME in if
-        if (!!val && typeof val === 'string' && val.trim().length >= config.elasticsearch.fullTextFieldMinLength && key === 'roleId') {
+        if (!!val && typeof val === 'string') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
             const exactQuery = esb.matchQuery(textField, val).boost(1.2);
             should.push(exactQuery);
             must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
         } else {
-            const termQuery = Array.isArray(val) ? esb.termsQuery(key, val) : esb.termQuery(key, val!.toString());
+            const termQuery = Array.isArray(val) ? esb.termsQuery(key, val) : esb.termQuery(key, val!.toString()); // might hurt later
             filter.push(termQuery);
         }
     }
-    const requestBody = esb.requestBodySearch().query(esb.boolQuery().must(must).should(should).filter(filter)).toJSON();
+    for (const key in filters?.ruleFilters) {
+        if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
+            const termNotQuery = Array.isArray(filters?.ruleFilters[key])
+                ? esb.termsQuery(key, filterMustNotArr(filters!.ruleFilters[key]))
+                : esb.termQuery(key, filters?.ruleFilters[key].toString());
+            mustNot.push(termNotQuery);
+
+            const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
+            if (mustArr.length !== 0) {
+                const termQuery = esb.termsQuery(key, mustArr);
+                filter.push(termQuery);
+            }
+        }
+    }
+    const requestBody = esb.requestBodySearch().query(esb.boolQuery().mustNot(mustNot).must(must).should(should).filter(filter)).toJSON();
+    return requestBody;
+};
+
+export function buildQueryRole(roleId: string, filters?: FilterQueries<Partial<RoleFilters>>) {
+    const must: esb.Query[] = [];
+    const should: esb.Query[] = [];
+    const filter: esb.Query[] = [];
+    const mustNot: esb.Query[] = [];
+
+    const query = {
+        roleId,
+        ...filters?.userFilters,
+    };
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [key, val] of Object.entries(query)) {
+        // DISPLAYNAME in if
+        if (!!val && typeof val === 'string') {
+            const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
+            const exactQuery = esb.matchQuery(textField, val).boost(1.2);
+            should.push(exactQuery);
+            must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
+        } else {
+            const termQuery = Array.isArray(val) ? esb.termsQuery(key, val) : esb.termQuery(key, val!.toString()); // might hurt later
+            filter.push(termQuery);
+        }
+    }
+    for (const key in filters?.ruleFilters) {
+        if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
+            const termNotQuery = Array.isArray(filters?.ruleFilters[key])
+                ? esb.termsQuery(key, filterMustNotArr(filters!.ruleFilters[key]))
+                : esb.termQuery(key, filters?.ruleFilters[key].toString());
+            mustNot.push(termNotQuery);
+
+            const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
+            if (mustArr.length !== 0) {
+                const termQuery = esb.termsQuery(key, mustArr);
+                filter.push(termQuery);
+            }
+        }
+    }
+    const requestBody = esb.requestBodySearch().query(esb.boolQuery().mustNot(mustNot).must(must).should(should).filter(filter)).toJSON();
     return requestBody;
 }
 

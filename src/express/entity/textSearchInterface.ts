@@ -1,16 +1,16 @@
 import { FilterQueries } from '../../types';
 import { IEntity } from './interface';
 
-export type EntityFilters = Partial<{
-    status: string | string[];
-    entityType: string | string[];
-    'digitalIdentities.source': string | string[];
-    'digitalIdentities.mail': string | string[];
-    mail: string | string[];
-    rank: string | string[];
-    responsibility: string | string[];
-    hierarchyPath: string | string[];
-}>;
+export type EntityFilters = {
+    status: string[];
+    entityType: string[];
+    'digitalIdentities.source': string[];
+    'digitalIdentities.mail': string[];
+    mail: string[];
+    rank: string[];
+    responsibility: string[];
+    hierarchyPath: string[];
+};
 
 export const entityMapFieldType: Map<string, Map<string, string>> = new Map<string, Map<string, string>>([
     ['source', new Map<string, string>([['Digital Identity', 'digitalIdentities.source']])],
