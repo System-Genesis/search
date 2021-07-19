@@ -36,15 +36,24 @@ const main = async () => {
     const i = 0;
     if (i !== 0) {
         await initializeMongo();
-
+        // dsadsasds
         await initializeRabbit();
+        await deleteElasticData();
+        await initElasticIndexes();
+        await readJsonAndWriteElastic(`${process.cwd()}/roles2.json`, config.elasticsearch.indexNames.roles, 'roleId');
+        await readJsonAndWriteElastic(`${process.cwd()}/populatedDB.json`, config.elasticsearch.indexNames.entities, 'id');
+        await readJsonAndWriteElastic(`${process.cwd()}/diPopulate2.json`, config.elasticsearch.indexNames.digitalIdentities, 'uniqueId');
+        await readJsonAndWriteElastic(`${process.cwd()}/ogPopulate2.json`, config.elasticsearch.indexNames.organizationGroups, 'id');
     }
-    await deleteElasticData();
-    await initElasticIndexes();
-    await readJsonAndWriteElastic(`${process.cwd()}/roles2.json`, config.elasticsearch.indexNames.roles, 'roleId');
-    await readJsonAndWriteElastic(`${process.cwd()}/populatedDB.json`, config.elasticsearch.indexNames.entities, 'id');
-    await readJsonAndWriteElastic(`${process.cwd()}/diPopulate2.json`, config.elasticsearch.indexNames.digitalIdentities, 'uniqueId');
-    await readJsonAndWriteElastic(`${process.cwd()}/ogPopulate2.json`, config.elasticsearch.indexNames.organizationGroups, 'id');
+    process.once('SIGUSR2', () => {
+        process.kill(process.pid, 'SIGUSR2');
+    });
+
+    process.on('SIGINT', () => {
+        // this is only called on ctrl+c, not restart
+        process.kill(process.pid, 'SIGINT');
+    });
+
     const server = new Server(service.port);
 
     await server.start();

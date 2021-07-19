@@ -5,13 +5,13 @@ import { IDigitalIdentity } from './interface';
 export type DigitalIdentityFilters = Partial<{
     type: string[];
     source: string[];
-    isRoleAttachable: boolean;
+    isRoleAttachable: boolean[]; // important
     mail: string[];
     jobTitle: string[];
     entityId: string[];
 }>;
 
-export const groupMapFieldType: Map<string, Map<string, string>> = new Map<string, Map<string, string>>([
+export const digitalIdentityMapFieldType: Map<string, Map<string, string>> = new Map<string, Map<string, string>>([
     ['type', new Map<string, string>([['Digital Identity', 'type']])],
     ['source', new Map<string, string>([['Digital Identity', 'source']])],
     ['isRoleAttachable', new Map<string, string>([['Digital Identity', 'isRoleAttachable']])],

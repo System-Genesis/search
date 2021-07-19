@@ -52,7 +52,7 @@ const { defaultResultLimit } = config.elasticsearch;
 const defaultQueryConfig: QueryConfig = {
     resultSize: defaultResultLimit,
 };
-
+// k.
 export abstract class ElasticSearchBaseRepository<T> {
     protected _client: Client;
 

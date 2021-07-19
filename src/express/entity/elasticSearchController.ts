@@ -1,5 +1,4 @@
 import { Response, Request } from 'express';
-import * as qs from 'qs';
 import ElasticEntityRepository from './elasticSearchRepository';
 import { IEntity } from './interface';
 import { EntityFilters } from './textSearchInterface';
@@ -12,11 +11,10 @@ export class ElasticEntityController {
         const fullName: string = req.query!.fullName!.toString();
         delete reqFilters.fullName;
         if (typeof reqFilters.ruleFilters === 'string') {
-            reqFilters.ruleFilters = qs.parse(JSON.parse(JSON.stringify(reqFilters.ruleFilters.toString())));
-            console.log(reqFilters.ruleFilters);
+            reqFilters.ruleFilters = JSON.parse(reqFilters.ruleFilters.toString());
         }
         if (typeof reqFilters.userFilters === 'string') {
-            reqFilters.userFilters = qs.parse(JSON.parse(JSON.stringify(reqFilters.userFilters.toString())));
+            reqFilters.userFilters = JSON.parse(reqFilters.userFilters.toString());
         }
         const filteredObject: FilterQueries<Partial<EntityFilters>> = extractEntityFiltersQuery(
             reqFilters.ruleFilters as RuleFilter[],

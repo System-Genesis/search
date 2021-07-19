@@ -9,6 +9,8 @@
     "test": "jest",
     "build": "tsc",
     "build:watch": "tsc --watch",
+    "watch": "nodemon ./src/index.ts",
+    "deva": "npm run build:watch && npm run watch",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "prettier": "prettier --config .prettierrc.js 'src/**/*.ts' --check",

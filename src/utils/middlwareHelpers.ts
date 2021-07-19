@@ -1,27 +1,24 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-restricted-syntax */
-import { DigitalIdentityFilters } from '../express/digitalIdentity/textSearchInterface';
+import { DigitalIdentityFilters, digitalIdentityMapFieldType } from '../express/digitalIdentity/textSearchInterface';
 import { EntityFilters, entityMapFieldType } from '../express/entity/textSearchInterface';
 import { GroupFilters, groupMapFieldType } from '../express/group/textSearchInterface';
 import { RoleFilters, roleMapFieldType } from '../express/role/textSearchInterface';
 import { RuleFilter, FilterQueries } from '../types';
 
-export const filterMustNotArr = (array: string[]): string[] => {
-    const newArr: string[] = array.filter((element) => element.startsWith('!'));
-    const newArrWithoutNot: string[] = newArr.map((element) => element.slice(1));
+export const filterMustNotArr = (array: any[]): any[] => {
+    const newArr: any[] = array.filter((element) => (element as any).toString().startsWith('!'));
+    const newArrWithoutNot: any[] = newArr.map((element) => element.slice(1));
     return newArrWithoutNot;
 };
-export const filterMustArr = (array: string[]): string[] => {
-    const newArr: string[] = array.filter((element) => !element.startsWith('!'));
-    const newArrWithoutNot: string[] = newArr.map((element) => element.slice(1));
-    return newArrWithoutNot;
+export const filterMustArr = (array: any[]): any[] => {
+    const newArr: any[] = array.filter((element) => !(element as any).toString().startsWith('!'));
+    return newArr;
 };
 
 export const extractEntityFiltersQuery = (filtersQuery: RuleFilter[] = [], userQuery: RuleFilter[] = []): FilterQueries<Partial<EntityFilters>> => {
     let userFilters: Partial<EntityFilters> = {};
     let mustNotFilters: Partial<EntityFilters> = {};
-    // let rule: RuleFilter = { field: 'source', values: ['!es_name'], entityType: 'Digital Identity' };
-    // filtersQuery.push(rule);
     console.log((<RuleFilter[]>filtersQuery)[0]);
     for (const filterRule of filtersQuery) {
         if (mustNotFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] === undefined) {
@@ -45,8 +42,7 @@ export const extractEntityFiltersQuery = (filtersQuery: RuleFilter[] = [], userQ
 export const extractGroupFiltersQuery = (filtersQuery: RuleFilter[] = [], userQuery: RuleFilter[] = []): FilterQueries<Partial<GroupFilters>> => {
     let userFilters: Partial<GroupFilters> = {};
     let mustNotFilters: Partial<GroupFilters> = {};
-    // let rule: RuleFilter = { field: 'source', values: ['!es_name'], entityType: 'Digital Identity' };
-    // filtersQuery.push(rule);
+    console.log((<RuleFilter[]>filtersQuery)[0]);
     for (const filterRule of filtersQuery) {
         if (mustNotFilters[groupMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] === undefined) {
             mustNotFilters[groupMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = [];
@@ -74,20 +70,21 @@ export const extractDIFiltersQuery = (
     let mustNotFilters: Partial<DigitalIdentityFilters> = {};
     // let rule: RuleFilter = { field: 'source', values: ['!es_name'], entityType: 'Digital Identity' };
     // filtersQuery.push(rule);
+    console.log((<RuleFilter[]>filtersQuery)[0]);
     for (const filterRule of filtersQuery) {
-        if (mustNotFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] === undefined) {
-            mustNotFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = [];
+        if (mustNotFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] === undefined) {
+            mustNotFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = [];
         }
-        mustNotFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = (
-            mustNotFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] as []
+        mustNotFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = (
+            mustNotFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] as []
         ).concat(filterRule.values as []);
     }
     for (const filterRule of userQuery) {
-        if (userFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] === undefined) {
-            userFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = [];
+        if (userFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] === undefined) {
+            userFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = [];
         }
-        userFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = (
-            userFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] as []
+        userFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = (
+            userFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] as []
         ).concat(filterRule.values as []);
     }
     return { userFilters, ruleFilters: mustNotFilters } as FilterQueries<Partial<DigitalIdentityFilters>>;

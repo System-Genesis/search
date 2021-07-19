@@ -87,7 +87,7 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, val] of Object.entries(query)) {
         // DISPLAYNAME in if
-        if (!!val && typeof val === 'string') {
+        if (!!val && typeof val === 'string' && key === 'displayName') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
             const exactQuery = esb.matchQuery(textField, val).boost(1.2);
             should.push(exactQuery);
@@ -99,13 +99,15 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
     }
     for (const key in filters?.ruleFilters) {
         if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
-            const termNotQuery = Array.isArray(filters?.ruleFilters[key])
-                ? esb.termsQuery(key, filterMustNotArr(filters!.ruleFilters[key]))
-                : esb.termQuery(key, filters?.ruleFilters[key].toString());
-            mustNot.push(termNotQuery);
-
+            const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
+            if (mustNotArr.length !== 0) {
+                console.log(`hey, ${key}`);
+                const termNotQuery = esb.termsQuery(key, mustNotArr);
+                mustNot.push(termNotQuery);
+            }
             const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
             if (mustArr.length !== 0) {
+                console.log('hey2');
                 const termQuery = esb.termsQuery(key, mustArr);
                 filter.push(termQuery);
             }
@@ -128,26 +130,30 @@ export const buildQueryDI = (uniqueId: string, filters?: FilterQueries<Partial<D
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, val] of Object.entries(query)) {
-        // DISPLAYNAME in if
-        if (!!val && typeof val === 'string') {
+        // DISPLAYNAME in idsad
+        if (!!val && typeof val === 'string' && key === 'uniqueId') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
             const exactQuery = esb.matchQuery(textField, val).boost(1.2);
             should.push(exactQuery);
             must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
         } else {
             const termQuery = Array.isArray(val) ? esb.termsQuery(key, val) : esb.termQuery(key, val!.toString()); // might hurt later
+            console.log('t');
+            console.log(termQuery);
             filter.push(termQuery);
         }
     }
     for (const key in filters?.ruleFilters) {
         if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
-            const termNotQuery = Array.isArray(filters?.ruleFilters[key])
-                ? esb.termsQuery(key, filterMustNotArr(filters!.ruleFilters[key]))
-                : esb.termQuery(key, filters?.ruleFilters[key].toString());
-            mustNot.push(termNotQuery);
-
+            const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
+            if (mustNotArr.length !== 0) {
+                console.log('hey');
+                const termNotQuery = esb.termsQuery(key, mustNotArr);
+                mustNot.push(termNotQuery);
+            }
             const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
             if (mustArr.length !== 0) {
+                console.log('hey2');
                 const termQuery = esb.termsQuery(key, mustArr);
                 filter.push(termQuery);
             }
@@ -171,7 +177,7 @@ export function buildQueryRole(roleId: string, filters?: FilterQueries<Partial<R
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, val] of Object.entries(query)) {
         // DISPLAYNAME in if
-        if (!!val && typeof val === 'string') {
+        if (!!val && typeof val === 'string' && key === 'roleId') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
             const exactQuery = esb.matchQuery(textField, val).boost(1.2);
             should.push(exactQuery);
@@ -183,13 +189,15 @@ export function buildQueryRole(roleId: string, filters?: FilterQueries<Partial<R
     }
     for (const key in filters?.ruleFilters) {
         if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
-            const termNotQuery = Array.isArray(filters?.ruleFilters[key])
-                ? esb.termsQuery(key, filterMustNotArr(filters!.ruleFilters[key]))
-                : esb.termQuery(key, filters?.ruleFilters[key].toString());
-            mustNot.push(termNotQuery);
-
+            const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
+            if (mustNotArr.length !== 0) {
+                console.log('hey');
+                const termNotQuery = esb.termsQuery(key, mustNotArr);
+                mustNot.push(termNotQuery);
+            }
             const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
             if (mustArr.length !== 0) {
+                console.log('hey2');
                 const termQuery = esb.termsQuery(key, mustArr);
                 filter.push(termQuery);
             }

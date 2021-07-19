@@ -30,23 +30,67 @@ class ElasticGroupRepository extends ElasticSearchBaseRepository<IOrganizationGr
             should.push(esb.matchQuery(`name.${fullTextFieldName}`, name).boost(1.2));
             should.push(esb.matchQuery(`name.${fullTextFieldName}`, name).fuzziness('AUTO'));
         }
-        if (!!hierarchy) should.push(esb.matchQuery(`hierarchy.${fullTextFieldName}`, hierarchy));
-        if (!!underGroupId) filter.push(esb.termsQuery('ancestors', underGroupId));
-        if (isAlive !== undefined) {
-            const typeAlive: string = isAlive.toString() === 'true' ? 'active' : 'inactive';
-            filter.push(esb.termQuery('status', typeAlive));
+        if (!!hierarchy) {
+            should.push(esb.matchQuery(`hierarchy.${fullTextFieldName}`, hierarchy).boost(1.2));
+            should.push(esb.matchQuery(`hierarchy.${fullTextFieldName}`, hierarchy).fuzziness('AUTO'));
+        }
+
+        if (!!underGroupId && underGroupId.length !== 0) {
+            if (underGroupId !== undefined && underGroupId.length !== 0) {
+                const mustNotArr: string[] = Array.isArray(underGroupId) ? filterMustNotArr(underGroupId) : [];
+                if (mustNotArr.length !== 0) {
+                    const termNotQuery = esb.termsQuery('ancestors', mustNotArr);
+                    mustNot.push(termNotQuery);
+                }
+                const mustArr: string[] = Array.isArray(underGroupId) ? filterMustArr(underGroupId) : [];
+                if (mustArr.length !== 0) {
+                    const termQuery = esb.termsQuery('ancestors', mustArr);
+                    filter.push(termQuery);
+                }
+            }
+        }
+        if (isAlive !== undefined && isAlive.length !== 0) {
+            for (const alive of isAlive) {
+                const typeAlive: string = alive.toString() === 'true' ? 'active' : 'inactive';
+                filter.push(esb.termQuery('status', typeAlive));
+            }
         }
         for (const key in filters?.ruleFilters) {
             if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
-                const termNotQuery = Array.isArray(filters?.ruleFilters[key])
-                    ? esb.termsQuery(key, filterMustNotArr(filters!.ruleFilters[key]))
-                    : esb.termQuery(key, filters?.ruleFilters[key].toString());
-                mustNot.push(termNotQuery);
-
-                const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
-                if (mustArr.length !== 0) {
-                    const termQuery = esb.termsQuery(key, mustArr);
-                    filter.push(termQuery);
+                if (key === 'isAlive') {
+                    if (filters?.ruleFilters[key] !== undefined && (filters?.ruleFilters[key] as []).length !== 0) {
+                        for (const alive of filters?.ruleFilters[key] as []) {
+                            const typeAlive: string = (alive as any).toString() === 'true' ? 'active' : 'inactive';
+                            filter.push(esb.termQuery('status', typeAlive));
+                        }
+                    }
+                } else if (key === 'underGroupId') {
+                    if (filters?.ruleFilters[key] !== undefined && (filters?.ruleFilters[key] as []).length !== 0) {
+                        const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters.ruleFilters[key] as []) : [];
+                        if (mustNotArr.length !== 0) {
+                            const termNotQuery = esb.termsQuery('ancestors', mustNotArr);
+                            mustNot.push(termNotQuery);
+                        }
+                        const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters.ruleFilters[key] as []) : [];
+                        if (mustArr.length !== 0) {
+                            const termQuery = esb.termsQuery('ancestors', mustArr);
+                            filter.push(termQuery);
+                        }
+                        filter.push(esb.termsQuery('ancestors', filters?.ruleFilters[key] as []));
+                    }
+                } else {
+                    const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
+                    if (mustNotArr.length !== 0) {
+                        console.log('hey');
+                        const termNotQuery = esb.termsQuery(key, mustNotArr);
+                        mustNot.push(termNotQuery);
+                    }
+                    const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
+                    if (mustArr.length !== 0) {
+                        console.log('hey2');
+                        const termQuery = esb.termsQuery(key, mustArr);
+                        filter.push(termQuery);
+                    }
                 }
             }
         }

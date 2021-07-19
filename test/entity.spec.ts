@@ -1,24 +1,8 @@
 import * as request from 'supertest';
 import * as qs from 'qs';
-import Server from '../src/express/server';
-import config from '../src/config/index';
-// import promiseAllWithFails from '../src/utils/promiseAllWithFails'
-const { service } = config;
 
-let server: Server;
+import { server } from './digitalIdentity.spec';
 
-beforeAll(async () => {
-    jest.useFakeTimers();
-    server = new Server(service.port);
-    console.log('Starting server...');
-
-    await server.start();
-
-    console.log(`Server started on port: ${service.port}`);
-});
-afterAll((done) => {
-    server.http.close(done);
-});
 describe('GET /search with ', () => {
     it('!es_name ,should return 200  & valid response and 1 entity ', async (done) => {
         request(server.app)
@@ -133,6 +117,89 @@ describe('GET /search with ', () => {
             .expect(400)
             .end((err, _) => {
                 return done(err);
+            });
+    });
+
+    it('should return 200 & err response ', async (done) => {
+        request(server.app)
+            .get(`/api/entity/search`)
+            .query(qs.stringify({ fullName: 'm' }))
+            .expect(400)
+            .end((err, _) => {
+                return done(err);
+            });
+    });
+
+    it('filter rank "ultimate" and userfilter es,city and rulefilter !city ,should return 200  & valid response and 1 entity ', async (done) => {
+        request(server.app)
+            .get(`/api/entity/search`)
+            .query(
+                qs.stringify({
+                    userFilters: [
+                        { field: 'source', entityType: 'Digital Identity', values: ['city_name', 'es_name'] },
+                        { field: 'rank', entityType: 'Entity', values: ['ultimate'] },
+                    ],
+                    ruleFilters: [{ field: 'source', values: ['!city_name'], entityType: 'Digital Identity' }],
+                    fullName: 'ma',
+                }),
+            )
+            .expect(200)
+            .end((err, res) => {
+                if (err) {
+                    throw done(err);
+                }
+                expect(res.body.toString()).toBe(
+                    [
+                        {
+                            id: 157861738,
+                            entityType: 'agumon',
+                            personalNumber: '1299157',
+                            firstName: 'Jermain',
+                            lastName: 'MacGyver',
+                            akaUnit: 'gondor',
+                            rank: 'ultimate',
+                            mail: 'Jermain.MacGyver88@jello.com',
+                            job: 'Technician - National Research Facilitator',
+                            sex: 'ז',
+                            phone: '2882',
+                            mobilePhone: '57-5367865',
+                            digitalIdentities: [
+                                {
+                                    type: 'domUser',
+                                    source: 'es_name',
+                                    mail: 'Jermain.MacGyver88@jello.com',
+                                    uniqueId: 'Jermain.MacGyver88@jello.com',
+                                    isRoleAttachable: true,
+                                    role: [],
+                                },
+                            ],
+                            displayName: 'Jermain MacGyver',
+                        },
+                    ].toString(),
+                );
+                return done();
+            });
+    });
+    it('filter rank "ultimated" and userfilter es,city and rulefilter !city ,should return 200  & empty array ', async (done) => {
+        request(server.app)
+            .get(`/api/entity/search`)
+            .query(
+                qs.stringify({
+                    userFilters: [
+                        { field: 'source', entityType: 'Digital Identity', values: ['city_name', 'es_name'] },
+                        { field: 'rank', entityType: 'Entity', values: ['ultimated'] },
+                    ],
+                    ruleFilters: [{ field: 'source', values: ['!city_name'], entityType: 'Digital Identity' }],
+                    fullName: 'ma',
+                }),
+            )
+            .expect(200)
+            .end((err, res) => {
+                if (err) {
+                    throw done(err);
+                }
+                expect(res.body.toString()).toBe([].toString());
+                return done();
             });
     });
 });

@@ -9,6 +9,12 @@ export class ElasticDIController {
         const reqFilters = req.query;
         const uniqueId: string = req.query!.uniqueId!.toString();
         delete reqFilters.uniqueId;
+        if (typeof reqFilters.ruleFilters === 'string') {
+            reqFilters.ruleFilters = JSON.parse(reqFilters.ruleFilters.toString());
+        }
+        if (typeof reqFilters.userFilters === 'string') {
+            reqFilters.userFilters = JSON.parse(reqFilters.userFilters.toString());
+        }
         const filteredObject: FilterQueries<Partial<DigitalIdentityFilters>> = extractDIFiltersQuery(
             reqFilters.ruleFilters as RuleFilter[],
             reqFilters.userFilters as RuleFilter[],

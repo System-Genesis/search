@@ -10,6 +10,12 @@ export class ElasticGroupController {
         const reqFilters = req.query;
         delete reqFilters.name;
         delete reqFilters.hierarchy;
+        if (typeof reqFilters.ruleFilters === 'string') {
+            reqFilters.ruleFilters = JSON.parse(reqFilters.ruleFilters.toString());
+        }
+        if (typeof reqFilters.userFilters === 'string') {
+            reqFilters.userFilters = JSON.parse(reqFilters.userFilters.toString());
+        }
         const filteredObject: FilterQueries<Partial<GroupFilters>> = extractGroupFiltersQuery(
             reqFilters.ruleFilters as RuleFilter[],
             reqFilters.userFilters as RuleFilter[],

@@ -33,8 +33,8 @@ export const EntitySchema = Joi.object({
 export const getSearchRequestSchema = Joi.object({
     query: {
         fullName: Joi.string().required().min(2).max(20),
-        ruleFilters: Joi.alternatives().try(Joi.array(), Joi.string()),
-        userFilters: Joi.alternatives().try(Joi.array(), Joi.string()),
+        ruleFilters: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
+        userFilters: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
     },
 });
 

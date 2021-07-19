@@ -9,6 +9,12 @@ export class ElasticRoleController {
         const reqFilters = req.query;
         const roleId: string = req.query!.roleId!.toString();
         delete reqFilters.roleId;
+        if (typeof reqFilters.ruleFilters === 'string') {
+            reqFilters.ruleFilters = JSON.parse(reqFilters.ruleFilters.toString());
+        }
+        if (typeof reqFilters.userFilters === 'string') {
+            reqFilters.userFilters = JSON.parse(reqFilters.userFilters.toString());
+        }
         const filteredObject: FilterQueries<Partial<RoleFilters>> = extractRoleFiltersQuery(
             reqFilters.ruleFilters as RuleFilter[],
             reqFilters.userFilters as RuleFilter[],

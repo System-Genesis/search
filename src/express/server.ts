@@ -34,6 +34,10 @@ class Server {
         return app;
     }
 
+    async close() {
+        this.http.close();
+    }
+
     async start() {
         this.http = this.app.listen(this.port);
         await once(this.http, 'listening');
