@@ -1,6 +1,8 @@
+/* eslint-disable prefer-const */
 import { Response, Request } from 'express';
+import { sendToLogger } from '../../rabbit';
 import { FilterQueries, RuleFilter } from '../../types';
-import { extractDIFiltersQuery } from '../../utils/middlwareHelpers';
+import { extractDIFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
 import ElasticDIRepository from './elasticSearchRepository';
 import { DigitalIdentityFilters } from './textSearchInterface';
 
@@ -9,18 +11,23 @@ export class ElasticDIController {
         const reqFilters = req.query;
         const uniqueId: string = req.query!.uniqueId!.toString();
         delete reqFilters.uniqueId;
-        if (typeof reqFilters.ruleFilters === 'string') {
-            reqFilters.ruleFilters = JSON.parse(reqFilters.ruleFilters.toString());
+        let { ruleFilters, ...userFilterss } = reqFilters;
+
+        const userFilters: Partial<DigitalIdentityFilters> = transformQueryToUserFilters(userFilterss);
+
+        try {
+            if (typeof reqFilters.ruleFilters === 'string') {
+                ruleFilters = JSON.parse(ruleFilters!.toString());
+            }
+
+            const filteredObject: FilterQueries<Partial<DigitalIdentityFilters>> = extractDIFiltersQuery(ruleFilters as RuleFilter[], userFilters);
+
+            const response = await ElasticDIRepository.searchByFullName(uniqueId, filteredObject);
+            res.json(response);
+        } catch (err) {
+            await sendToLogger('error', err.message);
+            res.json(err.message);
         }
-        if (typeof reqFilters.userFilters === 'string') {
-            reqFilters.userFilters = JSON.parse(reqFilters.userFilters.toString());
-        }
-        const filteredObject: FilterQueries<Partial<DigitalIdentityFilters>> = extractDIFiltersQuery(
-            reqFilters.ruleFilters as RuleFilter[],
-            reqFilters.userFilters as RuleFilter[],
-        );
-        const response = await ElasticDIRepository.searchByFullName(uniqueId, filteredObject);
-        res.json(response);
     }
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable import/no-mutable-exports */
 import * as request from 'supertest';
@@ -24,11 +25,11 @@ afterAll(async () => {
 describe('GET /search with ', () => {
     it('source on rule filters: mir_name, es_name ,should return 200  & valid response and 4 entity ', async (done) => {
         request(server.app)
-            .get(`/api/digitalIdentity/search`)
+            .get(`/api/digitalIdentities/search`)
             .query(
                 qs.stringify({
-                    ruleFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['mir_name', 'es_name', 'city_name'] }],
-                    uniqueId: 'e208',
+                    ruleFilters: [{ "field": "source", "entityType": "Digital Identity", "values": ["mir_name", "es_name", "city_name"] }],
+                    uniqueId: "e208",
                 }),
             )
             .expect(200)
@@ -93,12 +94,12 @@ describe('GET /search with ', () => {
     });
     it('source on rule filters: mir_name, es_name ,should and user filters: mir_name return 200  & valid response and 1 entity ', async (done) => {
         request(server.app)
-            .get(`/api/digitalIdentity/search`)
+            .get(`/api/digitalIdentities/search`)
             .query(
                 qs.stringify({
-                    ruleFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['mir_name', 'es_name', 'city_name'] }],
-                    uniqueId: 'e208',
-                    userFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['mir_name'] }],
+                    ruleFilters: [{ "field": "source", "entityType": "Digital Identity", "values": ["mir_name", "es_name", "city_name"] }],
+                    uniqueId: "e208",
+                    source: "mir_name",
                 }),
             )
             .expect(200)
@@ -123,10 +124,10 @@ describe('GET /search with ', () => {
     });
     it('source on rule filters: !mir_name, es_name ,should return 200  & valid response and empty array ', async (done) => {
         request(server.app)
-            .get(`/api/digitalIdentity/search`)
+            .get(`/api/digitalIdentities/search`)
             .query(
                 qs.stringify({
-                    ruleFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['!mir_name', 'es_name', 'city_name'] }],
+                    ruleFilters:[{ "field": "source", "entityType": "Digital Identity", "values": ["!mir_name", "es_name", "city_name"] }],
                     uniqueId: 'e208',
                 }),
             )

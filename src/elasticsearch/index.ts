@@ -1,3 +1,4 @@
+/* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
 
@@ -14,13 +15,15 @@ import { filterMustArr, filterMustNotArr } from '../utils/middlwareHelpers';
 
 export async function initElasticIndexes() {
     // eslint-disable-next-line no-restricted-syntax
+
     for (const indexSetting of indexes) {
         const { settings = {}, mappings = {}, name } = indexSetting;
         if ((await clientElastic.indices.exists({ index: name })).statusCode === 404) {
-            await clientElastic.indices.create({
+            const res = await clientElastic.indices.create({
                 index: name,
                 body: { settings, mappings },
             });
+            console.log(res);
         }
     }
 }
@@ -78,42 +81,66 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
     const mustNot: esb.Query[] = [];
-
+    const excludedFields: string[] = [];
     const query = {
         displayName,
-        ...filters?.userFilters,
     };
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, val] of Object.entries(query)) {
         // DISPLAYNAME in if
-        if (!!val && typeof val === 'string' && key === 'displayName') {
+        if (!!val && typeof val === 'string') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
             const exactQuery = esb.matchQuery(textField, val).boost(1.2);
             should.push(exactQuery);
             must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
-        } else {
-            const termQuery = Array.isArray(val) ? esb.termsQuery(key, val) : esb.termQuery(key, val!.toString()); // might hurt later
-            filter.push(termQuery);
+        }
+    }
+    for (const key in filters?.userFilters) {
+        if (Object.prototype.hasOwnProperty.call(filters?.userFilters, key)) {
+            if (key === 'expanded') {
+                if (filters!.userFilters[key]?.includes(false)) {
+                    excludedFields.push('digitalIdentities');
+                }
+            } else {
+                const mustNotArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters!.userFilters[key]) : [];
+                if (mustNotArr.length !== 0) {
+                    const termNotQuery = esb.termsQuery(key, mustNotArr);
+                    mustNot.push(termNotQuery);
+                }
+                const mustArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters!.userFilters[key]) : [];
+                if (mustArr.length !== 0) {
+                    const termQuery = esb.termsQuery(key, mustArr);
+                    filter.push(termQuery);
+                }
+            }
         }
     }
     for (const key in filters?.ruleFilters) {
         if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
-            const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
-            if (mustNotArr.length !== 0) {
-                console.log(`hey, ${key}`);
-                const termNotQuery = esb.termsQuery(key, mustNotArr);
-                mustNot.push(termNotQuery);
-            }
-            const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
-            if (mustArr.length !== 0) {
-                console.log('hey2');
-                const termQuery = esb.termsQuery(key, mustArr);
-                filter.push(termQuery);
+            if (key === 'expanded') {
+                if (filters!.userFilters[key]?.includes(false)) {
+                    excludedFields.push('digitalIdentities');
+                }
+            } else {
+                const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
+                if (mustNotArr.length !== 0) {
+                    const termNotQuery = esb.termsQuery(key, mustNotArr);
+                    mustNot.push(termNotQuery);
+                }
+                const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
+                if (mustArr.length !== 0) {
+                    const termQuery = esb.termsQuery(key, mustArr);
+                    filter.push(termQuery);
+                }
             }
         }
     }
-    const requestBody = esb.requestBodySearch().query(esb.boolQuery().mustNot(mustNot).must(must).should(should).filter(filter)).toJSON();
+    const requestBody = esb
+        .requestBodySearch()
+        .query(esb.boolQuery().mustNot(mustNot).must(must).should(should).filter(filter))
+        .source({ excludes: excludedFields })
+        .toJSON();
     return requestBody;
 }
 
@@ -125,35 +152,41 @@ export const buildQueryDI = (uniqueId: string, filters?: FilterQueries<Partial<D
 
     const query = {
         uniqueId,
-        ...filters?.userFilters,
     };
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, val] of Object.entries(query)) {
         // DISPLAYNAME in idsad
-        if (!!val && typeof val === 'string' && key === 'uniqueId') {
+        if (!!val && typeof val === 'string') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
             const exactQuery = esb.matchQuery(textField, val).boost(1.2);
             should.push(exactQuery);
             must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
-        } else {
-            const termQuery = Array.isArray(val) ? esb.termsQuery(key, val) : esb.termQuery(key, val!.toString()); // might hurt later
-            console.log('t');
-            console.log(termQuery);
-            filter.push(termQuery);
+        }
+    }
+    for (const key in filters?.userFilters) {
+        if (Object.prototype.hasOwnProperty.call(filters?.userFilters, key)) {
+            const mustNotArr: any[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters!.userFilters[key]) : [];
+            if (mustNotArr.length !== 0) {
+                const termNotQuery = esb.termsQuery(key, mustNotArr);
+                mustNot.push(termNotQuery);
+            }
+            const mustArr: any[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters!.userFilters[key]) : [];
+            if (mustArr.length !== 0) {
+                const termQuery = esb.termsQuery(key, mustArr);
+                filter.push(termQuery);
+            }
         }
     }
     for (const key in filters?.ruleFilters) {
         if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
-            const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
+            const mustNotArr: any[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
             if (mustNotArr.length !== 0) {
-                console.log('hey');
                 const termNotQuery = esb.termsQuery(key, mustNotArr);
                 mustNot.push(termNotQuery);
             }
-            const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
+            const mustArr: any[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
             if (mustArr.length !== 0) {
-                console.log('hey2');
                 const termQuery = esb.termsQuery(key, mustArr);
                 filter.push(termQuery);
             }
@@ -171,33 +204,41 @@ export function buildQueryRole(roleId: string, filters?: FilterQueries<Partial<R
 
     const query = {
         roleId,
-        ...filters?.userFilters,
     };
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, val] of Object.entries(query)) {
         // DISPLAYNAME in if
-        if (!!val && typeof val === 'string' && key === 'roleId') {
+        if (!!val && typeof val === 'string') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
             const exactQuery = esb.matchQuery(textField, val).boost(1.2);
             should.push(exactQuery);
             must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
-        } else {
-            const termQuery = Array.isArray(val) ? esb.termsQuery(key, val) : esb.termQuery(key, val!.toString()); // might hurt later
-            filter.push(termQuery);
+        }
+    }
+    for (const key in filters?.userFilters) {
+        if (Object.prototype.hasOwnProperty.call(filters?.userFilters, key)) {
+            const mustNotArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters!.userFilters[key]) : [];
+            if (mustNotArr.length !== 0) {
+                const termNotQuery = esb.termsQuery(key, mustNotArr);
+                mustNot.push(termNotQuery);
+            }
+            const mustArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters!.userFilters[key]) : [];
+            if (mustArr.length !== 0) {
+                const termQuery = esb.termsQuery(key, mustArr);
+                filter.push(termQuery);
+            }
         }
     }
     for (const key in filters?.ruleFilters) {
         if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
             const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
             if (mustNotArr.length !== 0) {
-                console.log('hey');
                 const termNotQuery = esb.termsQuery(key, mustNotArr);
                 mustNot.push(termNotQuery);
             }
             const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
             if (mustArr.length !== 0) {
-                console.log('hey2');
                 const termQuery = esb.termsQuery(key, mustArr);
                 filter.push(termQuery);
             }

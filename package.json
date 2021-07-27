@@ -17,7 +17,7 @@
     "prettier:fix": "prettier --config .prettierrc.js 'src/**/*.ts' --write",
     "clean": "rimraf dist"
   },
-  "author": "Alexander Gurevich",
+  "author": "Tommy Afek",
   "license": "ISC",
   "dependencies": {
     "@elastic/elasticsearch": "^7.13.0",

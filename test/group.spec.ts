@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import * as qs from 'qs';
 import * as request from 'supertest';
 import { server } from './digitalIdentity.spec';
@@ -5,7 +6,7 @@ import { server } from './digitalIdentity.spec';
 describe('GET /search with ', () => {
     it('name only ', async (done) => {
         request(server.app)
-            .get(`/api/organizationGroup/search`)
+            .get(`/api/organizationGroups/search`)
             .query(qs.stringify({ name: 'wall' }))
             .expect(200)
             .end((err, res) => {
@@ -90,7 +91,7 @@ describe('GET /search with ', () => {
     });
     it('nane and hierarchy ,should return 200  & valid response ', async (done) => {
         request(server.app)
-            .get(`/api/organizationGroup/search`)
+            .get(`/api/organizationGroups/search`)
             .query(qs.stringify({ name: 'ha', hierarchy: 'amet' }))
             .expect(200)
             .end((err, res) => {
@@ -209,8 +210,8 @@ describe('GET /search with ', () => {
     });
     it('name bad request less than 2 letters, should return 400', async (done) => {
         request(server.app)
-            .get(`/api/organizationGroup/search`)
-            .query(qs.stringify({ name: 'e' }))
+            .get(`/api/organizationGroups/search`)
+            .query(qs.stringify({ name: "e" }))
             .expect(400)
             .end((err, _) => {
                 return done(err);
@@ -218,8 +219,8 @@ describe('GET /search with ', () => {
     });
     it('name and hierarchy and is active, should return 200 and objects', async (done) => {
         request(server.app)
-            .get(`/api/organizationGroup/search`)
-            .query(qs.stringify({ name: 'ha', hierarchy: 'wall', userFilters: [{ field: 'isAlive', entityType: 'Group', values: [true] }] }))
+            .get(`/api/organizationGroups/search`)
+            .query(qs.stringify({ name: "ha", hierarchy: "wall", isAlive: true }))
             .expect(200)
             .end((err, res) => {
                 if (err) {
@@ -455,8 +456,8 @@ describe('GET /search with ', () => {
     });
     it('name and hierarchy and is underGroupId is valid, should return groups and 200', async (done) => {
         request(server.app)
-            .get(`/api/organizationGroup/search`)
-            .query(qs.stringify({ name: 'ha', hierarchy: 'wall', userFilters: [{ field: 'underGroupId', entityType: 'Group', values: ['1'] }] }))
+            .get(`/api/organizationGroups/search`)
+            .query(qs.stringify({ name: 'ha', hierarchy: 'wall', underGroupId: ["1"], heyyy: 'haha' }))
             .expect(200)
             .end((err, res) => {
                 if (err) {
@@ -692,8 +693,8 @@ describe('GET /search with ', () => {
     });
     it('name and hierarchy and is underGroupId is not existing in any of the objects, should return [] and 200', async (done) => {
         request(server.app)
-            .get(`/api/organizationGroup/search`)
-            .query(qs.stringify({ name: 'ha', hierarchy: 'wall', userFilters: [{ field: 'underGroupId', entityType: 'Group', values: ['2'] }] }))
+            .get(`/api/organizationGroups/search`)
+            .query(qs.stringify({ name: 'ha', hierarchy: 'wall', underGroupId: ["2"] }))
             .expect(200)
             .end((err, res) => {
                 if (err) {
@@ -705,10 +706,8 @@ describe('GET /search with ', () => {
     });
     it('name and hierarchy and is underGroupId is NOT(!) in rules is not existing in any of the objects, should return [] and 200', async (done) => {
         request(server.app)
-            .get(`/api/organizationGroup/search`)
-            .query(
-                qs.stringify({ name: 'ha', hierarchy: 'wall', ruleFilters: [{ field: 'underGroupId', entityType: 'Group', values: ['2', '!1'] }] }),
-            )
+            .get(`/api/organizationGroups/search`)
+            .query(qs.stringify({ name: 'ha', hierarchy: 'wall', underGroupId: ["2", "!1"] }))
             .expect(200)
             .end((err, res) => {
                 if (err) {
@@ -720,10 +719,8 @@ describe('GET /search with ', () => {
     });
     it('name and hierarchy and is underGroupId is NOT(!) in user rules is not existing in any of the objects, should return [] and 200', async (done) => {
         request(server.app)
-            .get(`/api/organizationGroup/search`)
-            .query(
-                qs.stringify({ name: 'ha', hierarchy: 'wall', userFilters: [{ field: 'underGroupId', entityType: 'Group', values: ['2', '!1'] }] }),
-            )
+            .get(`/api/organizationGroups/search`)
+            .query(qs.stringify({ name: 'ha', hierarchy: 'wall', underGroupId: ["2", "!1"] }))
             .expect(200)
             .end((err, res) => {
                 if (err) {
@@ -735,10 +732,8 @@ describe('GET /search with ', () => {
     });
     it('name and hierarchy and check undergroupId with 2 values: ancestors (!36,1) and in in user rules is not existing in any of the objects, should return [] and 200', async (done) => {
         request(server.app)
-            .get(`/api/organizationGroup/search`)
-            .query(
-                qs.stringify({ name: 'ha', hierarchy: 'wall', userFilters: [{ field: 'underGroupId', entityType: 'Group', values: ['!36', '1'] }] }),
-            )
+            .get(`/api/organizationGroups/search`)
+            .query(qs.stringify({ name: 'ha', hierarchy: 'wall', underGroupId: ["!36", "1"] }))
             .expect(200)
             .end((err, res) => {
                 if (err) {

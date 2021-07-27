@@ -1,27 +1,31 @@
+/* eslint-disable prefer-const */
 import { Response, Request } from 'express';
 import ElasticEntityRepository from './elasticSearchRepository';
 import { IEntity } from './interface';
 import { EntityFilters } from './textSearchInterface';
-import { extractEntityFiltersQuery } from '../../utils/middlwareHelpers';
+import { extractEntityFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
 import { FilterQueries, RuleFilter } from '../../types';
+import { sendToLogger } from '../../rabbit';
 
 export class ElasticEntityController {
     static async searchByFullname(req: Request, res: Response) {
         const reqFilters = req.query;
         const fullName: string = req.query!.fullName!.toString();
         delete reqFilters.fullName;
-        if (typeof reqFilters.ruleFilters === 'string') {
-            reqFilters.ruleFilters = JSON.parse(reqFilters.ruleFilters.toString());
+        let { ruleFilters, ...userFilterss } = reqFilters;
+        const userFilters: Partial<EntityFilters> = transformQueryToUserFilters(userFilterss);
+
+        try {
+            if (typeof reqFilters.ruleFilters === 'string') {
+                ruleFilters = JSON.parse(ruleFilters!.toString());
+            }
+            const filteredObject: FilterQueries<Partial<EntityFilters>> = extractEntityFiltersQuery(ruleFilters as RuleFilter[], userFilters);
+            const response = await ElasticEntityRepository.searchByFullName(fullName, filteredObject);
+            res.json(response);
+        } catch (err) {
+            await sendToLogger('error', err.message);
+            res.json(err.message);
         }
-        if (typeof reqFilters.userFilters === 'string') {
-            reqFilters.userFilters = JSON.parse(reqFilters.userFilters.toString());
-        }
-        const filteredObject: FilterQueries<Partial<EntityFilters>> = extractEntityFiltersQuery(
-            reqFilters.ruleFilters as RuleFilter[],
-            reqFilters.userFilters as RuleFilter[],
-        );
-        const response = await ElasticEntityRepository.searchByFullName(fullName, filteredObject);
-        res.json(response);
     }
 
     static async getEntityById(entityId: string): Promise<IEntity> {

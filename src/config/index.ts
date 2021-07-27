@@ -42,10 +42,6 @@ const config = {
         fullTextFieldMinLength: 2,
         fullTextFieldName: 'autocomplete',
     },
-    mongo: {
-        uri: env.get('MONGO_URI').required().asUrlString(),
-        featureCollectionName: env.get('MONGO_FEATURE_COLLECTION_NAME').required().asString(),
-    },
     rabbit: {
         uri: env.get('RABBIT_URI').required().asUrlString(),
         retryOptions: {
@@ -53,6 +49,7 @@ const config = {
             retries: env.get('RABBIT_RETRY_RETRIES').default(10).asIntPositive(),
             factor: env.get('RABBIT_RETRY_FACTOR').default(1.8).asFloatPositive(),
         },
+        loggerQueueName: env.get('RABBIT_QUEUE_LOG_NAME').default('LOG_QUEUE').asString(),
     },
 };
 

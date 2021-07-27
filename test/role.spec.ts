@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import * as qs from 'qs';
 import * as request from 'supertest';
 import { server } from './digitalIdentity.spec';
@@ -5,7 +6,7 @@ import { server } from './digitalIdentity.spec';
 describe('GET /search with ', () => {
     it('roleId only ', async (done) => {
         request(server.app)
-            .get(`/api/role/search`)
+            .get(`/api/roles/search`)
             .query(qs.stringify({ roleId: 'es2' }))
             .expect(200)
             .end((err, res) => {
@@ -76,7 +77,7 @@ describe('GET /search with ', () => {
     });
     it('!city_name ,should return 200  & valid response and 1 entity ', async (done) => {
         request(server.app)
-            .get(`/api/role/search`)
+            .get(`/api/roles/search`)
             .query(qs.stringify({ roleId: 'es2', ruleFilters: [{ field: 'source', entityType: 'Role', values: ['!city_name'] }] }))
             .expect(200)
             .end((err, res) => {
@@ -98,7 +99,7 @@ describe('GET /search with ', () => {
     });
     it('roleId bad request less than 2 letters, should return 400', async (done) => {
         request(server.app)
-            .get(`/api/role/search`)
+            .get(`/api/roles/search`)
             .query(qs.stringify({ roleId: 'e' }))
             .expect(400)
             .end((err, _) => {

@@ -10,6 +10,8 @@ export type EntityFilters = {
     rank: string[];
     responsibility: string[];
     hierarchyPath: string[];
+    expanded: boolean[];
+    underGroupId: string[];
 };
 
 export const entityMapFieldType: Map<string, Map<string, string>> = new Map<string, Map<string, string>>([
@@ -25,6 +27,9 @@ export const entityMapFieldType: Map<string, Map<string, string>> = new Map<stri
     ['status', new Map<string, string>([['Entity', 'status']])],
     ['responsibility', new Map<string, string>([['Entity', 'responsibility']])],
     ['hierarchyPath', new Map<string, string>([['Entity', 'hierarchyPath']])],
+    ['expanded', new Map<string, string>([['Entity', 'expanded']])],
+    ['underGroupId', new Map<string, string>([['Entity', 'underGroupId']])],
+    ['entityType', new Map<string, string>([['Entity', 'entityType']])],
 ]);
 
 export interface EntityTextSearch {

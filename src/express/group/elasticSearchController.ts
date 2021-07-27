@@ -1,8 +1,10 @@
+/* eslint-disable prefer-const */
 import { Response, Request } from 'express';
 import ElasticGroupRepository from './elasticSearchRepository';
 import { GroupFilters, GroupQuery } from './textSearchInterface';
-import { extractGroupFiltersQuery } from '../../utils/middlwareHelpers';
+import { extractGroupFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
 import { FilterQueries, RuleFilter } from '../../types';
+import { sendToLogger } from '../../rabbit';
 
 export class ElasticGroupController {
     static async searchByFullname(req: Request, res: Response) {
@@ -10,19 +12,22 @@ export class ElasticGroupController {
         const reqFilters = req.query;
         delete reqFilters.name;
         delete reqFilters.hierarchy;
-        if (typeof reqFilters.ruleFilters === 'string') {
-            reqFilters.ruleFilters = JSON.parse(reqFilters.ruleFilters.toString());
-        }
-        if (typeof reqFilters.userFilters === 'string') {
-            reqFilters.userFilters = JSON.parse(reqFilters.userFilters.toString());
-        }
-        const filteredObject: FilterQueries<Partial<GroupFilters>> = extractGroupFiltersQuery(
-            reqFilters.ruleFilters as RuleFilter[],
-            reqFilters.userFilters as RuleFilter[],
-        );
+        let { ruleFilters, ...userFilterss } = reqFilters;
 
-        const response = await ElasticGroupRepository.searchByNameAndHierarchy(groupQueryObj, filteredObject);
-        res.json(response);
+        console.log(ruleFilters!);
+        const userFilters: Partial<GroupFilters> = transformQueryToUserFilters(userFilterss);
+        try {
+            if (typeof reqFilters.ruleFilters === 'string') {
+                ruleFilters = JSON.parse(ruleFilters!.toString());
+            }
+            const filteredObject: FilterQueries<Partial<GroupFilters>> = extractGroupFiltersQuery(ruleFilters as RuleFilter[], userFilters);
+
+            const response = await ElasticGroupRepository.searchByNameAndHierarchy(groupQueryObj, filteredObject);
+            res.json(response);
+        } catch (err) {
+            await sendToLogger('error', err.message);
+            res.json(err.message);
+        }
     }
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable guard-for-in */
 /* eslint-disable prefer-const */
 /* eslint-disable no-restricted-syntax */
 import { DigitalIdentityFilters, digitalIdentityMapFieldType } from '../express/digitalIdentity/textSearchInterface';
@@ -15,9 +16,75 @@ export const filterMustArr = (array: any[]): any[] => {
     const newArr: any[] = array.filter((element) => !(element as any).toString().startsWith('!'));
     return newArr;
 };
+// type NonMethodKeys<T> = { [P in keyof T]: T[P] extends Function ? never : P }[keyof T];
+// type TypeOf<T> = T extends boolean ? 'boolean' : T extends string ? 'string' : T extends number ? 'number' : 'object' | (new (...args: any[]) => T);
 
-export const extractEntityFiltersQuery = (filtersQuery: RuleFilter[] = [], userQuery: RuleFilter[] = []): FilterQueries<Partial<EntityFilters>> => {
-    let userFilters: Partial<EntityFilters> = {};
+// function getFields<T>(fields: { [P in NonMethodKeys<T>]: TypeOf<T[P]> }): typeof fields {
+//     return fields;
+// }
+// function isKey<E>(_str: string | number | symbol): _str is keyof E {
+//     return true;
+// }
+// type PossibleKeys = 'foo' | 'bar';
+// type NonFunctionPropertyNames<T> = {
+//     [K in keyof T]: T[K] extends Function ? never : K;
+// }[keyof T];
+// type StringKeys<T> = Extract<keyof T, any>;
+
+// type Exactly<T, U> = T & Record<Exclude<keyof U, keyof T>, never>;
+
+// function pick<T>(obj: T, keys: keyof T): any {
+//     return obj[keys];
+// }
+
+// const asValidObject = <T extends Partial<NonFunctionPropertyNames<T>>>(t: T) => t;
+// type ExcludedTypes<T, U> = {
+//     [K in Extract<keyof T, keyof U>]: T[K];
+// };
+
+// function showType<T>(args: ExcludedTypes<T, T>) {
+//     console.log(args);
+// }
+// function deepCopy<T>(obj) {
+//     let copy: T = { ...obj };
+
+//     // Handle Object
+
+//     for (let attr in obj) {
+//         // eslint-disable-next-line no-prototype-builtins
+//         if ((obj as Object).hasOwnProperty(attr)) copy[attr] = obj[attr];
+//     }
+//     return copy;
+// }
+// function foo<T extends Partial<T>, K extends keyof T>(source: T, value: T[K], property: K) {
+//     // eslint-disable-next-line no-param-reassign
+//     source[property] = value;
+// }
+// function getProperty<T, K extends keyof T>(o: T, propertyName: K): T[K] {
+//     return o[propertyName]; // o[propertyName] is of type T[K]
+// }
+
+export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
+    let userFilters: Partial<T> = {};
+    // let obj: ExcludedTypes<T, T> = deepCopy(query as T);
+    for (let key in query) {
+        if (key === 'expanded') {
+            if (Array.isArray(query[key])) {
+                userFilters[key] = (query[key] as []).map((element) => (element as string).toString() === 'true') as never;
+            } else {
+                userFilters[key] = [(query[key] as string).toString() === 'true'] as never;
+            }
+        } else {
+            userFilters[key] = Array.isArray(query[key]) ? query[key] : [query[key]];
+        }
+    }
+    return userFilters;
+}
+
+export const extractEntityFiltersQuery = (
+    filtersQuery: RuleFilter[] = [],
+    userQuery: Partial<EntityFilters> = {},
+): FilterQueries<Partial<EntityFilters>> => {
     let mustNotFilters: Partial<EntityFilters> = {};
     console.log((<RuleFilter[]>filtersQuery)[0]);
     for (const filterRule of filtersQuery) {
@@ -28,19 +95,14 @@ export const extractEntityFiltersQuery = (filtersQuery: RuleFilter[] = [], userQ
             mustNotFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] as []
         ).concat(filterRule.values as []);
     }
-    for (const filterRule of userQuery) {
-        if (userFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] === undefined) {
-            userFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = [];
-        }
-        userFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = (
-            userFilters[entityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] as []
-        ).concat(filterRule.values as []);
-    }
-    return { userFilters, ruleFilters: mustNotFilters } as FilterQueries<Partial<EntityFilters>>;
+
+    return { userFilters: userQuery, ruleFilters: mustNotFilters } as FilterQueries<Partial<EntityFilters>>;
 };
 
-export const extractGroupFiltersQuery = (filtersQuery: RuleFilter[] = [], userQuery: RuleFilter[] = []): FilterQueries<Partial<GroupFilters>> => {
-    let userFilters: Partial<GroupFilters> = {};
+export const extractGroupFiltersQuery = (
+    filtersQuery: RuleFilter[] = [],
+    userQuery: Partial<GroupFilters> = {},
+): FilterQueries<Partial<GroupFilters>> => {
     let mustNotFilters: Partial<GroupFilters> = {};
     console.log((<RuleFilter[]>filtersQuery)[0]);
     for (const filterRule of filtersQuery) {
@@ -51,22 +113,13 @@ export const extractGroupFiltersQuery = (filtersQuery: RuleFilter[] = [], userQu
             mustNotFilters[groupMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] as []
         ).concat(filterRule.values as []);
     }
-    for (const filterRule of userQuery) {
-        if (userFilters[groupMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] === undefined) {
-            userFilters[groupMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = [];
-        }
-        userFilters[groupMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = (
-            userFilters[groupMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] as []
-        ).concat(filterRule.values as []);
-    }
-    return { userFilters, ruleFilters: mustNotFilters } as FilterQueries<Partial<GroupFilters>>;
+    return { userFilters: userQuery, ruleFilters: mustNotFilters } as FilterQueries<Partial<GroupFilters>>;
 };
 
 export const extractDIFiltersQuery = (
     filtersQuery: RuleFilter[] = [],
-    userQuery: RuleFilter[] = [],
+    userQuery: Partial<DigitalIdentityFilters> = {},
 ): FilterQueries<Partial<DigitalIdentityFilters>> => {
-    let userFilters: Partial<DigitalIdentityFilters> = {};
     let mustNotFilters: Partial<DigitalIdentityFilters> = {};
     // let rule: RuleFilter = { field: 'source', values: ['!es_name'], entityType: 'Digital Identity' };
     // filtersQuery.push(rule);
@@ -79,22 +132,15 @@ export const extractDIFiltersQuery = (
             mustNotFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] as []
         ).concat(filterRule.values as []);
     }
-    for (const filterRule of userQuery) {
-        if (userFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] === undefined) {
-            userFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = [];
-        }
-        userFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = (
-            userFilters[digitalIdentityMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] as []
-        ).concat(filterRule.values as []);
-    }
-    return { userFilters, ruleFilters: mustNotFilters } as FilterQueries<Partial<DigitalIdentityFilters>>;
+
+    return { userFilters: userQuery, ruleFilters: mustNotFilters } as FilterQueries<Partial<DigitalIdentityFilters>>;
 };
 
-export const extractRoleFiltersQuery = (filtersQuery: RuleFilter[] = [], userQuery: RuleFilter[] = []): FilterQueries<Partial<RoleFilters>> => {
-    let userFilters: Partial<RoleFilters> = {};
+export const extractRoleFiltersQuery = (
+    filtersQuery: RuleFilter[] = [],
+    userQuery: Partial<RoleFilters> = {},
+): FilterQueries<Partial<RoleFilters>> => {
     let mustNotFilters: Partial<RoleFilters> = {};
-    // let rule: RuleFilter = { field: 'source', values: ['!es_name'], entityType: 'Digital Identity' };
-    // filtersQuery.push(rule);
     for (const filterRule of filtersQuery) {
         if (mustNotFilters[roleMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] === undefined) {
             mustNotFilters[roleMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = [];
@@ -103,15 +149,8 @@ export const extractRoleFiltersQuery = (filtersQuery: RuleFilter[] = [], userQue
             mustNotFilters[roleMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] as []
         ).concat(filterRule.values as []);
     }
-    for (const filterRule of userQuery) {
-        if (userFilters[roleMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] === undefined) {
-            userFilters[roleMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = [];
-        }
-        userFilters[roleMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = (
-            userFilters[roleMapFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] as []
-        ).concat(filterRule.values as []);
-    }
-    return { userFilters, ruleFilters: mustNotFilters } as FilterQueries<Partial<RoleFilters>>;
+
+    return { userFilters: userQuery, ruleFilters: mustNotFilters } as FilterQueries<Partial<RoleFilters>>;
 };
 
 export default { extractEntityFiltersQuery, extractGroupFiltersQuery };

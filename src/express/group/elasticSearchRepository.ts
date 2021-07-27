@@ -81,13 +81,11 @@ class ElasticGroupRepository extends ElasticSearchBaseRepository<IOrganizationGr
                 } else {
                     const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
                     if (mustNotArr.length !== 0) {
-                        console.log('hey');
                         const termNotQuery = esb.termsQuery(key, mustNotArr);
                         mustNot.push(termNotQuery);
                     }
                     const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
                     if (mustArr.length !== 0) {
-                        console.log('hey2');
                         const termQuery = esb.termsQuery(key, mustArr);
                         filter.push(termQuery);
                     }
@@ -95,17 +93,12 @@ class ElasticGroupRepository extends ElasticSearchBaseRepository<IOrganizationGr
             }
         }
 
-        let response: any = [];
-        try {
-            const queryBody = esb
-                .requestBodySearch()
-                .query(esb.boolQuery().should(should).mustNot(mustNot).filter(filter).minimumShouldMatch(1))
-                .toJSON();
-            // eslint-disable-next-line no-return-await
-            response = await this.search(queryBody);
-        } catch (err) {
-            console.log(err);
-        }
+        const queryBody = esb
+            .requestBodySearch()
+            .query(esb.boolQuery().should(should).mustNot(mustNot).filter(filter).minimumShouldMatch(1))
+            .toJSON();
+        // eslint-disable-next-line no-return-await
+        const response = await this.search(queryBody);
 
         return response;
     }
