@@ -20,7 +20,7 @@ class ElasticGroupRepository extends ElasticSearchBaseRepository<IOrganizationGr
     }
 
     async searchByNameAndHierarchy(query: Partial<GroupQuery>, filters: FilterQueries<Partial<GroupFilters>> = { userFilters: {}, ruleFilters: {} }) {
-        const { underGroupId, isAlive } = filters.userFilters;
+        const { underGroupId, isAlive, status } = filters.userFilters;
         const { hierarchy, name } = query;
         const should: esb.Query[] = [];
         const filter: esb.Query[] = [];
@@ -53,6 +53,18 @@ class ElasticGroupRepository extends ElasticSearchBaseRepository<IOrganizationGr
             for (const alive of isAlive) {
                 const typeAlive: string = alive.toString() === 'true' ? 'active' : 'inactive';
                 filter.push(esb.termQuery('status', typeAlive));
+            }
+        }
+        if (!!status && status.length !== 0) {
+            const mustNotArr: string[] = Array.isArray(status) ? filterMustNotArr(status) : [];
+            if (mustNotArr.length !== 0) {
+                const termNotQuery = esb.termsQuery('status', mustNotArr);
+                mustNot.push(termNotQuery);
+            }
+            const mustArr: string[] = Array.isArray(status) ? filterMustArr(status) : [];
+            if (mustArr.length !== 0) {
+                const termQuery = esb.termsQuery('status', mustArr);
+                filter.push(termQuery);
             }
         }
         for (const key in filters?.ruleFilters) {

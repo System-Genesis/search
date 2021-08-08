@@ -9,7 +9,7 @@ const { service } = config;
 const main = async () => {
     await initializeRabbit();
     const i = 0;
-    if (i !== 0) {
+    if (i === 0) {
         await deleteElasticData();
         await initElasticIndexes();
 

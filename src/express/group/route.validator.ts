@@ -13,6 +13,7 @@ export const getSearchRequestSchema = customJoi.object({
         ruleFilters: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         underGroupId: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         isAlive: Joi.alternatives().try(Joi.array(), Joi.bool()).allow(Joi.array().length(0)),
+        status: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
     },
 });
 

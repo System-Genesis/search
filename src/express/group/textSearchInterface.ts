@@ -8,12 +8,13 @@ export type GroupQuery = {
 
 export type GroupFilters = {
     underGroupId: string[];
+    status: [];
     isAlive: boolean[];
 };
 
 export const groupMapFieldType: Map<string, Map<string, string>> = new Map<string, Map<string, string>>([
     ['underGroupId', new Map<string, string>([['Group', 'underGroupId']])],
-
+    ['status', new Map<string, string>([['Group', 'status']])],
     ['isAlive', new Map<string, string>([['Group', 'isAlive']])],
 ]);
 
