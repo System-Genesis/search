@@ -22,11 +22,11 @@ services:
     ports:
       - 9001:8000
     env_file: ./search_docker.env
-  volumes:
-    - ./db-enums.ts:/usr/src/app/app/config/db-enums.ts
-  depends_on:
-    - rabbit
-    - elasticsearch
+    volumes:
+      - ./db-enums.ts:/usr/src/app/app/config/db-enums.ts
+    depends_on:
+      - rabbit
+      - elasticsearch
 volumes:
   elasticsearch_data:
     driver: local
