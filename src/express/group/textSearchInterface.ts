@@ -13,9 +13,9 @@ export type GroupFilters = {
 };
 
 export const groupMapFieldType: Map<string, Map<string, string>> = new Map<string, Map<string, string>>([
-    ['underGroupId', new Map<string, string>([['Group', 'underGroupId']])],
-    ['status', new Map<string, string>([['Group', 'status']])],
-    ['isAlive', new Map<string, string>([['Group', 'isAlive']])],
+    ['underGroupId', new Map<string, string>([['group', 'underGroupId']])],
+    ['status', new Map<string, string>([['group', 'status']])],
+    ['isAlive', new Map<string, string>([['group', 'isAlive']])],
 ]);
 
 export interface OrganizationGroupTextSearch {

@@ -73,7 +73,7 @@ class ElasticGroupRepository extends ElasticSearchBaseRepository<IOrganizationGr
                     if (filters?.ruleFilters[key] !== undefined && (filters?.ruleFilters[key] as []).length !== 0) {
                         for (const alive of filters?.ruleFilters[key] as []) {
                             const typeAlive: string = (alive as any).toString() === 'true' ? 'active' : 'inactive';
-                            filter.push(esb.termQuery('status', typeAlive));
+                            mustNot.push(esb.termQuery('status', typeAlive));
                         }
                     }
                 } else if (key === 'underGroupId') {
@@ -86,9 +86,9 @@ class ElasticGroupRepository extends ElasticSearchBaseRepository<IOrganizationGr
                         const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters.ruleFilters[key] as []) : [];
                         if (mustArr.length !== 0) {
                             const termQuery = esb.termsQuery('ancestors', mustArr);
-                            filter.push(termQuery);
+                            mustNot.push(termQuery);
                         }
-                        filter.push(esb.termsQuery('ancestors', filters?.ruleFilters[key] as []));
+                        // mustNot.push(esb.termsQuery('ancestors', filters?.ruleFilters[key] as []));
                     }
                 } else {
                     const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
@@ -99,7 +99,7 @@ class ElasticGroupRepository extends ElasticSearchBaseRepository<IOrganizationGr
                     const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
                     if (mustArr.length !== 0) {
                         const termQuery = esb.termsQuery(key, mustArr);
-                        filter.push(termQuery);
+                        mustNot.push(termQuery);
                     }
                 }
             }

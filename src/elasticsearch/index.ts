@@ -119,7 +119,7 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
     for (const key in filters?.ruleFilters) {
         if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
             if (key === 'expanded') {
-                if (filters!.userFilters[key]?.includes(false)) {
+                if (filters!.ruleFilters[key]?.includes(false)) {
                     excludedFields.push('digitalIdentities');
                 }
             } else {
@@ -131,7 +131,7 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
                 const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
                 if (mustArr.length !== 0) {
                     const termQuery = esb.termsQuery(key, mustArr);
-                    filter.push(termQuery);
+                    mustNot.push(termQuery);
                 }
             }
         }
@@ -188,7 +188,7 @@ export const buildQueryDI = (uniqueId: string, filters?: FilterQueries<Partial<D
             const mustArr: any[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
             if (mustArr.length !== 0) {
                 const termQuery = esb.termsQuery(key, mustArr);
-                filter.push(termQuery);
+                mustNot.push(termQuery);
             }
         }
     }
@@ -240,7 +240,7 @@ export function buildQueryRole(roleId: string, filters?: FilterQueries<Partial<R
             const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
             if (mustArr.length !== 0) {
                 const termQuery = esb.termsQuery(key, mustArr);
-                filter.push(termQuery);
+                mustNot.push(termQuery);
             }
         }
     }
