@@ -5,8 +5,6 @@ const { rabbit } = config;
 
 export const initializeRabbit = async () => {
     console.log('Connecting to Rabbit...');
-    console.log(rabbit.uri);
-    console.log(config.elasticsearch.nodes);
     await menash.connect(rabbit.uri, rabbit.retryOptions);
     console.log('Rabbit connected');
 

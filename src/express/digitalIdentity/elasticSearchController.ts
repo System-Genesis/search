@@ -23,6 +23,7 @@ export class ElasticDIController {
             const filteredObject: FilterQueries<Partial<DigitalIdentityFilters>> = extractDIFiltersQuery(ruleFilters as RuleFilter[], userFilters);
 
             const response = await ElasticDIRepository.searchByFullName(uniqueId, filteredObject);
+
             res.json(response);
         } catch (err) {
             await sendToLogger('error', err.message);

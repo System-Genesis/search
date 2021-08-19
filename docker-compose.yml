@@ -16,7 +16,7 @@ services:
       - 'elasticsearch_data:/bitnami/elasticsearch/data'
 
   search:
-    image: tommyafek/search
+    image: systemgensis0/search
     restart: unless-stopped
     build: .
     ports:

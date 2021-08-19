@@ -12,12 +12,12 @@ export type DigitalIdentityFilters = Partial<{
 }>;
 
 export const digitalIdentityMapFieldType: Map<string, Map<string, string>> = new Map<string, Map<string, string>>([
-    ['type', new Map<string, string>([['digital identity', 'type']])],
-    ['source', new Map<string, string>([['digital identity', 'source']])],
-    ['isRoleAttachable', new Map<string, string>([['digital identity', 'isRoleAttachable']])],
-    ['mail', new Map<string, string>([['digital identity', 'mail']])],
-    ['jobTitle', new Map<string, string>([['digital identity', 'jobTitle']])],
-    ['entityId', new Map<string, string>([['digital identity', 'entityId']])],
+    ['type', new Map<string, string>([['digitalIdentity', 'type']])],
+    ['source', new Map<string, string>([['digitalIdentity', 'source']])],
+    ['isRoleAttachable', new Map<string, string>([['digitalIdentity', 'isRoleAttachable']])],
+    ['mail', new Map<string, string>([['digitalIdentity', 'mail']])],
+    ['jobTitle', new Map<string, string>([['digitalIdentity', 'jobTitle']])],
+    ['entityId', new Map<string, string>([['digitalIdentity', 'entityId']])],
 ]);
 
 export interface DigitalIdentityTextSearch {

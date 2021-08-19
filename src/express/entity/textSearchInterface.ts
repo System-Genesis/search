@@ -15,18 +15,18 @@ export type EntityFilters = {
 };
 
 export const entityMapFieldType: Map<string, Map<string, string>> = new Map<string, Map<string, string>>([
-    ['source', new Map<string, string>([['digital identity', 'digitalIdentities.source']])],
+    ['source', new Map<string, string>([['digitalIdentity', 'digitalIdentities.source']])],
     [
         'mail',
         new Map<string, string>([
-            ['digital identity', 'digitalIdentities.mail'],
+            ['digitalIdentity', 'digitalIdentities.mail'],
             ['entity', 'mail'],
         ]),
     ],
     ['rank', new Map<string, string>([['entity', 'rank']])],
     ['status', new Map<string, string>([['entity', 'status']])],
     ['responsibility', new Map<string, string>([['entity', 'responsibility']])],
-    ['hierarchyPath', new Map<string, string>([['entity', 'hierarchyPath']])],
+    ['hierarchy', new Map<string, string>([['entity', 'hierarchy']])],
     ['expanded', new Map<string, string>([['entity', 'expanded']])],
     ['underGroupId', new Map<string, string>([['entity', 'underGroupId']])],
     ['entityType', new Map<string, string>([['entity', 'entityType']])],

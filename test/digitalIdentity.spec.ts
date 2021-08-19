@@ -28,8 +28,8 @@ describe('GET /search with ', () => {
             .get(`/api/digitalIdentities/search`)
             .query(
                 qs.stringify({
-                    ruleFilters: [{ "field": "source", "entityType": "Digital Identity", "values": ["mir_name", "es_name", "city_name"] }],
-                    uniqueId: "e208",
+                    ruleFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['mir_name', 'es_name', 'city_name'] }],
+                    uniqueId: 'e208',
                 }),
             )
             .expect(200)
@@ -97,9 +97,9 @@ describe('GET /search with ', () => {
             .get(`/api/digitalIdentities/search`)
             .query(
                 qs.stringify({
-                    ruleFilters: [{ "field": "source", "entityType": "Digital Identity", "values": ["mir_name", "es_name", "city_name"] }],
-                    uniqueId: "e208",
-                    source: "mir_name",
+                    ruleFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['mir_name', 'es_name', 'city_name'] }],
+                    uniqueId: 'e208',
+                    source: 'mir_name',
                 }),
             )
             .expect(200)
@@ -127,7 +127,7 @@ describe('GET /search with ', () => {
             .get(`/api/digitalIdentities/search`)
             .query(
                 qs.stringify({
-                    ruleFilters:[{ "field": "source", "entityType": "Digital Identity", "values": ["!mir_name", "es_name", "city_name"] }],
+                    ruleFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['!mir_name', 'es_name', 'city_name'] }],
                     uniqueId: 'e208',
                 }),
             )

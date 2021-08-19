@@ -28,7 +28,7 @@ class Server {
 
         app.use(logger('dev'));
         app.use(appRouter);
-
+        // app.use(apm.middleware.connect()) MIDDLEWARE COOL STUFF
         app.use(errorMiddleware);
 
         return app;

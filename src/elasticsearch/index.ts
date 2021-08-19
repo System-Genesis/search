@@ -4,6 +4,7 @@
 
 import * as esb from 'elastic-builder';
 import * as fs from 'fs';
+
 import indexes from './settings/index';
 import clientElastic from './elasticSearchClientConfiguration';
 import config from '../config';
@@ -19,19 +20,17 @@ export async function initElasticIndexes() {
     for (const indexSetting of indexes) {
         const { settings = {}, mappings = {}, name } = indexSetting;
         if ((await clientElastic.indices.exists({ index: name })).statusCode === 404) {
-            const res = await clientElastic.indices.create({
+            await clientElastic.indices.create({
                 index: name,
                 body: { settings, mappings },
             });
-            console.log(res);
         }
     }
 }
 export async function isAlive() {
     console.log('Checking connection...');
     try {
-        const res = await clientElastic.cluster.health();
-        console.log(res);
+        await clientElastic.cluster.health();
         return true;
     } catch (err) {
         return false;

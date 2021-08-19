@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import * as apm from 'elastic-apm-node';
 import Server from './express/server';
 import { initializeRabbit } from './rabbit/index';
 import config from './config';
@@ -22,8 +23,15 @@ const main = async () => {
     const server = new Server(service.port);
 
     await server.start();
+    apm.start({
+        serviceName: 'search_service',
+        serverUrl: `http://localhost:8200`,
+    });
 
     console.log(`Server started on port: ${service.port}`);
+    const err = new Error('Ups, something broke2!');
+
+    apm.captureError(err);
 };
 
 main().catch((err) => console.error(err));
