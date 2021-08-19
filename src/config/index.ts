@@ -13,6 +13,7 @@ const passphrase = env.get('ELASTICSEARCH_SSL_PASSPHRASE').default('').asString(
 const config = {
     service: {
         port: env.get('PORT').required().asPortNumber(),
+        isMock: env.get('IS_MOCK').default('false').asString().toLowerCase() === 'true',
     },
     elasticsearch: {
         indexInitRetries: 3,
@@ -33,10 +34,10 @@ const config = {
                 env.get('ELASTICSEARCH_SSL_DISABLE_SERVER_IDENTITY_CHECK').default('true').asString().toLowerCase() === 'true',
         },
         indexNames: {
-            entities: 'kartoffelms.entities',
-            organizationGroups: 'kartoffelms.organizationgroups',
-            roles: 'kartoffelms.roles',
-            digitalIdentities: 'kartoffelms.digitalidentities',
+            entities: 'kartoffelmock.denormalizedentity',
+            organizationGroups: 'kartoffelmock.denormalizeddigitalidentity',
+            roles: 'kartoffelmock.denormalizedrole',
+            digitalIdentities: 'kartoffelmock.denormalizedorganizationgroup',
         },
         defaultResultLimit: 20,
         fullTextFieldMinLength: 2,
