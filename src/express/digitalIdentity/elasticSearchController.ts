@@ -9,9 +9,7 @@ import { DigitalIdentityFilters } from './textSearchInterface';
 export class ElasticDIController {
     static async searchByFullname(req: Request, res: Response) {
         const reqFilters = req.query;
-        const uniqueId: string = req.query!.uniqueId!.toString();
-        delete reqFilters.uniqueId;
-        let { ruleFilters, ...userFilterss } = reqFilters;
+        let { uniqueId, ruleFilters, ...userFilterss } = reqFilters;
 
         const userFilters: Partial<DigitalIdentityFilters> = transformQueryToUserFilters(userFilterss);
 
@@ -22,7 +20,7 @@ export class ElasticDIController {
 
             const filteredObject: FilterQueries<Partial<DigitalIdentityFilters>> = extractDIFiltersQuery(ruleFilters as RuleFilter[], userFilters);
 
-            const response = await ElasticDIRepository.searchByFullName(uniqueId, filteredObject);
+            const response = await ElasticDIRepository.searchByFullName(uniqueId!.toString(), filteredObject);
 
             res.json(response);
         } catch (err) {

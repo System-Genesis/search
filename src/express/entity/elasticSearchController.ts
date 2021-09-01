@@ -10,9 +10,7 @@ import { sendToLogger } from '../../rabbit';
 export class ElasticEntityController {
     static async searchByFullname(req: Request, res: Response) {
         const reqFilters = req.query;
-        const fullName: string = req.query!.fullName!.toString();
-        delete reqFilters.fullName;
-        let { ruleFilters, ...userFilterss } = reqFilters;
+        let { fullName, ruleFilters, ...userFilterss } = reqFilters;
         const userFilters: Partial<EntityFilters> = transformQueryToUserFilters(userFilterss);
 
         try {
@@ -20,7 +18,7 @@ export class ElasticEntityController {
                 ruleFilters = JSON.parse(ruleFilters!.toString());
             }
             const filteredObject: FilterQueries<Partial<EntityFilters>> = extractEntityFiltersQuery(ruleFilters as RuleFilter[], userFilters);
-            const response = await ElasticEntityRepository.searchByFullName(fullName, filteredObject);
+            const response = await ElasticEntityRepository.searchByFullName(fullName!.toString(), filteredObject);
             res.json(response);
         } catch (err) {
             await sendToLogger('error', err.message);

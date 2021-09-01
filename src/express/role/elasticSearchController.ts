@@ -9,9 +9,7 @@ import { sendToLogger } from '../../rabbit';
 export class ElasticRoleController {
     static async searchByFullname(req: Request, res: Response) {
         const reqFilters = req.query;
-        const roleId: string = req.query!.roleId!.toString();
-        delete reqFilters.roleId;
-        let { ruleFilters, ...userFilterss } = req.query;
+        let { roleId, ruleFilters, ...userFilterss } = reqFilters;
 
         const userFilters: Partial<RoleFilters> = transformQueryToUserFilters(userFilterss);
         try {
@@ -21,7 +19,7 @@ export class ElasticRoleController {
 
             const filteredObject: FilterQueries<Partial<RoleFilters>> = extractRoleFiltersQuery(ruleFilters as RuleFilter[], userFilters);
 
-            const response = await ElasticRoleRepository.searchByFullName(roleId, filteredObject);
+            const response = await ElasticRoleRepository.searchByFullName(roleId!.toString(), filteredObject);
             res.json(response);
         } catch (err) {
             await sendToLogger('error', err.message);

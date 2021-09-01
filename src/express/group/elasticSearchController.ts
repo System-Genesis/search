@@ -8,14 +8,10 @@ import { sendToLogger } from '../../rabbit';
 
 export class ElasticGroupController {
     static async searchByFullname(req: Request, res: Response) {
-        const groupQueryObj: Partial<GroupQuery> = { name: req.query.name!.toString(), hierarchy: req.query.hierarchy?.toString() || '' };
         const reqFilters = req.query;
-        delete reqFilters.name;
-        delete reqFilters.hierarchy;
-        let { ruleFilters, ...userFilterss } = reqFilters;
-
-        console.log(ruleFilters!);
-        const userFilters: Partial<GroupFilters> = transformQueryToUserFilters(userFilterss);
+        let { name, hierarchy, ruleFilters, ...userFiltersQuery } = reqFilters;
+        const groupQueryObj: Partial<GroupQuery> = { name: req.query.name!.toString(), hierarchy: req.query.hierarchy?.toString() || '' };
+        const userFilters: Partial<GroupFilters> = transformQueryToUserFilters(userFiltersQuery);
         try {
             if (typeof reqFilters.ruleFilters === 'string') {
                 ruleFilters = JSON.parse(ruleFilters!.toString());
