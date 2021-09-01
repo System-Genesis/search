@@ -35,9 +35,9 @@ const config = {
         },
         indexNames: {
             entities: 'kartoffelmock.denormalizedentity',
-            organizationGroups: 'kartoffelmock.denormalizeddigitalidentity',
+            organizationGroups: 'kartoffelmock.denormalizedorganizationgroup',
             roles: 'kartoffelmock.denormalizedrole',
-            digitalIdentities: 'kartoffelmock.denormalizedorganizationgroup',
+            digitalIdentities: 'kartoffelmock.denormalizeddigitalidentity',
         },
         defaultResultLimit: 20,
         fullTextFieldMinLength: 2,
