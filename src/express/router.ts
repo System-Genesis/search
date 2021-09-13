@@ -7,7 +7,7 @@ import roleRouter from './role/router';
 const appRouter = Router();
 
 appRouter.use('/api/entities', entityRouter);
-appRouter.use('/api/organizationGroups', groupRouter);
+appRouter.use('/api/groups', groupRouter);
 appRouter.use('/api/digitalIdentities', DIRouter);
 appRouter.use('/api/roles', roleRouter);
 
