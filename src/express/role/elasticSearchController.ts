@@ -22,8 +22,8 @@ export class ElasticRoleController {
             const response = await ElasticRoleRepository.searchByFullName(roleId!.toString(), filteredObject);
             res.json(response);
         } catch (err) {
-            await sendToLogger('error', err.message);
-            res.json(err.message);
+            await sendToLogger('error', (err as any).message);
+            res.json((err as any).message);
         }
     }
 }

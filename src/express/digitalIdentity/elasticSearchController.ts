@@ -24,8 +24,8 @@ export class ElasticDIController {
 
             res.json(response);
         } catch (err) {
-            await sendToLogger('error', err.message);
-            res.json(err.message);
+            await sendToLogger('error', (err as any).message);
+            res.json((err as any).message);
         }
     }
 }
