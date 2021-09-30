@@ -35,6 +35,12 @@ const entityMappings = {
                 [fullTextFieldName]: prefix_autocomplete_field_settings,
             },
         },
+        fullName: {
+            type: 'keyword',
+            fields: {
+                [fullTextFieldName]: prefix_autocomplete_field_settings,
+            },
+        },
         entityType: {
             type: 'keyword',
         },
