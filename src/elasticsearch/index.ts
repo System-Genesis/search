@@ -83,6 +83,7 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
     const excludedFields: string[] = [];
     const query = {
         displayName,
+        fullName: displayName,
     };
 
     // eslint-disable-next-line no-restricted-syntax
@@ -92,7 +93,7 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
             const exactQuery = esb.matchQuery(textField, val).boost(1.2);
             should.push(exactQuery);
-            must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
+            // must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
         }
     }
     for (const key in filters?.userFilters) {
