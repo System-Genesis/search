@@ -1,21 +1,32 @@
 version: '3.4'
 
 services:
-  mongo:
-    image: mongo
-    ports:
-      - 27017:27017
-
   rabbit:
     image: rabbitmq:3-management
     ports:
       - 5672:5672
       - 15672:15672
-
-  feature:
-    build: .
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.1
     environment:
-      PORT: 8000
-      MONGO_URI: mongodb://mongo
-      MONGO_FEATURE_COLLECTION_NAME: feature
-      RABBIT_URI: amqp://rabbit
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+    volumes:
+      - 'elasticsearch_data:/bitnami/elasticsearch/data'
+
+  search:
+    image: systemgensis0/search
+    restart: unless-stopped
+    build: .
+    ports:
+      - 9001:8000
+    env_file: ./search_docker.env
+    volumes:
+      - ./db-enums.ts:/usr/src/app/app/config/db-enums.ts
+    depends_on:
+      - rabbit
+      - elasticsearch
+volumes:
+  elasticsearch_data:
+    driver: local

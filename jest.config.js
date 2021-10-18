@@ -1,5 +1,7 @@
 module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
-    collectCoverage: true,
+    collectCoverage: false,
+    timers: 'fake',
+    runFirstly: ['digitalIdentity.spec.ts', 'entity.spec.ts'],
 };

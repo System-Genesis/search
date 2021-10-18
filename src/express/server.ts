@@ -8,9 +8,9 @@ import { errorMiddleware } from './error';
 import appRouter from './router';
 
 class Server {
-    private app: express.Application;
+    public app: express.Application;
 
-    private http: http.Server;
+    public http: http.Server;
 
     private port: number;
 
@@ -28,10 +28,14 @@ class Server {
 
         app.use(logger('dev'));
         app.use(appRouter);
-
+        // app.use(apm.middleware.connect()) MIDDLEWARE COOL STUFF
         app.use(errorMiddleware);
 
         return app;
+    }
+
+    async close() {
+        this.http.close();
     }
 
     async start() {
