@@ -82,7 +82,6 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
     const mustNot: esb.Query[] = [];
     const excludedFields: string[] = [];
     const query = {
-        displayName,
         fullName: displayName,
     };
 
@@ -91,9 +90,9 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
         // DISPLAYNAME in if
         if (!!val && typeof val === 'string') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
-            const exactQuery = esb.matchQuery(textField, val).boost(1.2);
+            const exactQuery = esb.matchQuery(textField, val).boost(1.2).fuzziness('AUTO');
             should.push(exactQuery);
-            // must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
+            must.push(esb.matchQuery(textField, val).fuzziness('AUTO').boost(1.2));
         }
     }
     for (const key in filters?.userFilters) {
