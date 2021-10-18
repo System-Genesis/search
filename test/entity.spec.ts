@@ -8,7 +8,7 @@ describe('GET /search with ', () => {
     it('!es_name ,should return 200  & valid response and 1 entity ', async (done) => {
         request(server.app)
             .get(`/api/entities/search`)
-            .query(qs.stringify({ ruleFilters: [{ "field": "source", "values": ["!es_name"], "entityType": "Digital Identity" }], fullName: 'ma' }))
+            .query(qs.stringify({ ruleFilters: [{ field: 'source', values: ['es_name'], entityType: 'digitalIdentity' }], fullName: 'ma' }))
             .expect(200)
             .end((err, res) => {
                 if (err) {
@@ -39,6 +39,7 @@ describe('GET /search with ', () => {
                                 },
                             ],
                             displayName: 'Macy Ryan',
+                            fullName: 'Macy Ryan',
                         },
                     ].toString(),
                 );
@@ -79,6 +80,7 @@ describe('GET /search with ', () => {
                                 },
                             ],
                             displayName: 'Macy Ryan',
+                            fullName: 'Macy Ryan',
                         },
                         {
                             id: 157861738,
@@ -104,6 +106,7 @@ describe('GET /search with ', () => {
                                 },
                             ],
                             displayName: 'Jermain MacGyver',
+                            fullName: 'Jermain MacGyver',
                         },
                     ].toString(),
                 );
@@ -138,7 +141,7 @@ describe('GET /search with ', () => {
                 qs.stringify({
                     'digitalIdentities.source': ['city_name', 'es_name'],
                     rank: 'ultimate',
-                    ruleFilters: [{ "field": "source", "values": ["!city_name"], "entityType": "Digital Identity" }],
+                    ruleFilters: [{ field: 'source', values: ['city_name'], entityType: 'digitalIdentity' }],
                     fullName: 'ma',
                 }),
             )
@@ -150,29 +153,37 @@ describe('GET /search with ', () => {
                 expect(res.body.toString()).toBe(
                     [
                         {
-                            id: 157861738,
+                            id: 157861728,
                             entityType: 'agumon',
-                            personalNumber: '1299157',
-                            firstName: 'Jermain',
-                            lastName: 'MacGyver',
+                            personalNumber: '9992756',
+                            firstName: 'Wallace',
+                            lastName: 'Kutch',
                             akaUnit: 'gondor',
-                            rank: 'ultimate',
-                            mail: 'Jermain.MacGyver88@jello.com',
-                            job: 'Technician - National Research Facilitator',
+                            mail: 'Wallace52@jello.com',
+                            job: 'Producer - Principal Solutions Consultant',
                             sex: 'ז',
-                            phone: '2882',
-                            mobilePhone: '57-5367865',
+                            phone: '4805',
+                            mobilePhone: '52-1084219',
                             digitalIdentities: [
                                 {
                                     type: 'domUser',
                                     source: 'es_name',
-                                    mail: 'Jermain.MacGyver88@jello.com',
-                                    uniqueId: 'Jermain.MacGyver88@jello.com',
+                                    mail: 'Wallace52@jello.com',
+                                    uniqueId: 'Wallace52@jello.com',
                                     isRoleAttachable: true,
-                                    role: [],
+                                    role: [
+                                        {
+                                            hierarchyIds: [152],
+                                            roleId: 'Wallace52@jello',
+                                            jobTitle: 'Producer - Principal Solutions Consultant',
+                                            hierarchy: 'wallmart/tempore/dolore/doloribus',
+                                            source: 'es_name',
+                                        },
+                                    ],
                                 },
                             ],
-                            displayName: 'Jermain MacGyver',
+                            displayName: 'Wallace Kutch',
+                            fullName: 'Wallace Kutch',
                         },
                     ].toString(),
                 );
@@ -184,10 +195,10 @@ describe('GET /search with ', () => {
             .get(`/api/entities/search`)
             .query(
                 qs.stringify({
-                    source: ["city_name", "es_name"],
-                    rank: "ultimated",
-                    ruleFilters: [{ "field": "source", "values": ["!city_name"], "entityType": "Digital Identity" }],
-                    fullName: "ma",
+                    'digitalIdentities.source': ['city_name', 'es_name'],
+                    rank: 'ultimated',
+                    ruleFilters: [{ field: 'source', values: ['city_name'], entityType: 'digitalIdentity' }],
+                    fullName: 'ma',
                 }),
             )
             .expect(200)

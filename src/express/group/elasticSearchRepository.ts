@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-extra-boolean-cast */
 import { Client } from '@elastic/elasticsearch';
-import * as esb from 'elastic-builder';
 import config from '../../config';
 import { buildQueryGroup } from '../../elasticsearch';
 import { ElasticSearchBaseRepository, QueryConfig } from '../../elasticsearch/elasticSearchBaseRepository';

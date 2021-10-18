@@ -64,6 +64,9 @@ export async function readJsonAndWriteElastic(path: string, modelType: string, i
     try {
         // eslint-disable-next-line no-plusplus
         for (let index = 0; index < files.length; index++) {
+            if (modelType === config.elasticsearch.indexNames.entities) {
+                files[index].fullName = files[index].firstName + ' ' + files[index].lastName;
+            }
             await clientElastic.index({
                 index: modelType,
 
@@ -116,6 +119,7 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
             }
         }
     }
+    console.log(filters?.ruleFilters);
     for (const key in filters?.ruleFilters) {
         if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
             if (key === 'expanded') {
@@ -232,7 +236,7 @@ export function buildQueryRole(roleId: string, filters?: FilterQueries<Partial<R
     }
     for (const key in filters?.ruleFilters) {
         if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
-            const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
+            const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
             if (mustNotArr.length !== 0) {
                 const termNotQuery = esb.termsQuery(key, mustNotArr);
                 mustNot.push(termNotQuery);
@@ -254,10 +258,12 @@ export function buildQueryGroup(query: Partial<GroupQuery>, filters: FilterQueri
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
     const mustNot: esb.Query[] = [];
+    const must: esb.Query[] = [];
 
     if (!!name) {
         should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).boost(1.2));
         should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).fuzziness('AUTO'));
+        must.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).fuzziness('AUTO').boost(1.2));
     }
     if (!!hierarchy) {
         should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, hierarchy).boost(1.2));
@@ -334,7 +340,10 @@ export function buildQueryGroup(query: Partial<GroupQuery>, filters: FilterQueri
         }
     }
 
-    const queryBody = esb.requestBodySearch().query(esb.boolQuery().should(should).mustNot(mustNot).filter(filter).minimumShouldMatch(1)).toJSON();
+    const queryBody = esb
+        .requestBodySearch()
+        .query(esb.boolQuery().should(should).mustNot(mustNot).must(must).filter(filter).minimumShouldMatch(1))
+        .toJSON();
     // eslint-disable-next-line no-return-await
     return queryBody;
 }

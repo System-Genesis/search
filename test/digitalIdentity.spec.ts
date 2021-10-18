@@ -4,20 +4,20 @@
 import * as request from 'supertest';
 import * as qs from 'qs';
 import Server from '../src/express/server';
-import config from '../src/config/index';
+//import config from '../src/config/index';
 
-const { service } = config;
+// const { service } = config;
 
 export let server: Server;
 
 beforeAll(async () => {
-    server = new Server(service.port);
+    server = new Server(3005);
     console.log('Starting server...');
     try {
         await server.start();
     } catch (err) {}
 
-    console.log(`Server started on port: ${service.port}`);
+    console.log(`Server started on port: 3005`);
 });
 afterAll(async () => {
     await server.close();
@@ -28,7 +28,7 @@ describe('GET /search with ', () => {
             .get(`/api/digitalIdentities/search`)
             .query(
                 qs.stringify({
-                    ruleFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['mir_name', 'es_name', 'city_name'] }],
+                    ruleFilters: [{ field: 'source', entityType: 'digitalIdentity', values: ['mir_name', 'es_name'] }],
                     uniqueId: 'e208',
                 }),
             )
@@ -71,22 +71,7 @@ describe('GET /search with ', () => {
                                 },
                             ],
                         },
-                        {
-                            type: 'domUser',
-                            source: 'city_name',
-                            uniqueId: 'e308261638@city.com',
-                            isRoleAttachable: true,
-                            entityId: 248,
-                            role: [],
-                        },
-                        {
-                            type: 'digUser',
-                            source: 'mir_name',
-                            uniqueId: 'e286444822@city.com',
-                            isRoleAttachable: false,
-                            entityId: 34,
-                            role: [],
-                        },
+                        { type: 'domUser', source: 'city_name', uniqueId: 'e308261638@city.com', isRoleAttachable: true, entityId: 248, role: [] },
                     ].toString(),
                 );
                 return done();
@@ -97,7 +82,7 @@ describe('GET /search with ', () => {
             .get(`/api/digitalIdentities/search`)
             .query(
                 qs.stringify({
-                    ruleFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['mir_name', 'es_name', 'city_name'] }],
+                    ruleFilters: [{ field: 'source', entityType: 'digitalIdentity', values: ['es_name', 'city_name'] }],
                     uniqueId: 'e208',
                     source: 'mir_name',
                 }),
@@ -127,8 +112,9 @@ describe('GET /search with ', () => {
             .get(`/api/digitalIdentities/search`)
             .query(
                 qs.stringify({
-                    ruleFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['!mir_name', 'es_name', 'city_name'] }],
+                    ruleFilters: [{ field: 'source', entityType: 'digitalIdentity', values: ['mir_name'] }],
                     uniqueId: 'e208',
+                    source: ['es_name', 'city_name'],
                 }),
             )
             .expect(200)

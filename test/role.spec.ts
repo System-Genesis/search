@@ -78,7 +78,7 @@ describe('GET /search with ', () => {
     it('!city_name ,should return 200  & valid response and 1 entity ', async (done) => {
         request(server.app)
             .get(`/api/roles/search`)
-            .query(qs.stringify({ roleId: 'es2', ruleFilters: [{ field: 'source', entityType: 'Role', values: ['!city_name'] }] }))
+            .query(qs.stringify({ roleId: 'es2', ruleFilters: [{ field: 'source', entityType: 'role', values: ['city_name'] }] }))
             .expect(200)
             .end((err, res) => {
                 if (err) {
