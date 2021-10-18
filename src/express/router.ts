@@ -10,7 +10,6 @@ appRouter.use('/api/entities', entityRouter);
 appRouter.use('/api/groups', groupRouter);
 appRouter.use('/api/digitalIdentities', DIRouter);
 appRouter.use('/api/roles', roleRouter);
-
 appRouter.use('/isAlive', (_req, res) => {
     res.status(200).send('alive');
 });
