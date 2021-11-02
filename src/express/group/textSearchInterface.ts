@@ -9,6 +9,7 @@ export type GroupQuery = {
 export type GroupFilters = {
     underGroupId: string[];
     status: [];
+    expanded: boolean[];
     isAlive: boolean[];
 };
 
@@ -16,6 +17,7 @@ export const groupMapFieldType: Map<string, Map<string, string>> = new Map<strin
     ['underGroupId', new Map<string, string>([['group', 'underGroupId']])],
     ['status', new Map<string, string>([['group', 'status']])],
     ['isAlive', new Map<string, string>([['group', 'isAlive']])],
+    ['expanded', new Map<string, string>([['group', 'expanded']])],
 ]);
 
 export interface OrganizationGroupTextSearch {

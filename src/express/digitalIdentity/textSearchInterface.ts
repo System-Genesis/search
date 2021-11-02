@@ -9,6 +9,7 @@ export type DigitalIdentityFilters = Partial<{
     mail: string[];
     jobTitle: string[];
     entityId: string[];
+    expanded: boolean[];
 }>;
 
 export const digitalIdentityMapFieldType: Map<string, Map<string, string>> = new Map<string, Map<string, string>>([
@@ -17,6 +18,7 @@ export const digitalIdentityMapFieldType: Map<string, Map<string, string>> = new
     ['isRoleAttachable', new Map<string, string>([['digitalIdentity', 'isRoleAttachable']])],
     ['mail', new Map<string, string>([['digitalIdentity', 'mail']])],
     ['jobTitle', new Map<string, string>([['digitalIdentity', 'jobTitle']])],
+    ['expanded', new Map<string, string>([['digitalIdentity', 'expanded']])],
     ['entityId', new Map<string, string>([['digitalIdentity', 'entityId']])],
 ]);
 
