@@ -82,7 +82,7 @@ export const getSearchRequestSchema = customJoi.object({
         rank: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         responsibility: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         hierarchyPath: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
-        expanded: Joi.alternatives().try(Joi.array(), Joi.bool()).allow(Joi.array().length(0)),
+        expanded: Joi.alternatives().try(Joi.array(), Joi.string(), Joi.boolean()).allow(Joi.array().length(0)),
         underGroupId: Joi.alternatives().try(Joi.array(), Joi.bool()).allow(Joi.array().length(0)),
     },
 });

@@ -290,7 +290,7 @@ export function buildQueryGroup(query: Partial<GroupQuery>, filters: FilterQueri
         should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, hierarchy).boost(1.2));
         should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, hierarchy).fuzziness('AUTO'));
     }
-    if (!!expanded && expanded) {
+    if (!!expanded && expanded.includes(true)) {
         isExpanded = true;
     }
 

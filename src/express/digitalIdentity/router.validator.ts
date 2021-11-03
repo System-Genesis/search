@@ -16,6 +16,7 @@ export const getSearchRequestSchema = customJoi.object({
         mail: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         jobTitle: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         entityId: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
+        expanded: Joi.alternatives().try(Joi.array(), Joi.string(), Joi.boolean()).allow(Joi.array().length(0)),
     },
 });
 
