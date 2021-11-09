@@ -13,4 +13,5 @@ export interface IOrganizationGroup {
     updatedAt: Date;
     directEntities: IEntity[];
     directRoles: IRole[];
+    diPrefix: string;
 }
