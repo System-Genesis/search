@@ -1,6 +1,7 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable prefer-const */
 /* eslint-disable no-restricted-syntax */
+import config from '../config';
 import { DigitalIdentityFilters, digitalIdentityMapFieldType } from '../express/digitalIdentity/textSearchInterface';
 import { EntityFilters, entityMapFieldType } from '../express/entity/textSearchInterface';
 import { GroupFilters, groupMapFieldType } from '../express/group/textSearchInterface';
@@ -27,11 +28,28 @@ export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
                 userFilters[key] = [(query[key] as string).toString() === 'true'] as never;
             }
         } else {
-            userFilters[key] = Array.isArray(query[key]) ? query[key] : [query[key]];
+            if (key === 'digitalIdentities.source') {
+                if (!Array.isArray(query[key])) {
+                    query[key] = [query[key]];
+                }
+                let allSources: string[] = [];
+                for (const element of query[key]) {
+                    if (config.aliases.hasOwnProperty(element)) {
+                        allSources = allSources.concat((config.aliases[element] as []));
+                    } else {
+                        allSources.push(element);
+                    }
+                }
+                userFilters[key] = allSources;
+
+            } else {
+                userFilters[key] = Array.isArray(query[key]) ? query[key] : [query[key]];
+            }
         }
     }
     return userFilters;
 }
+
 
 export const extractEntityFiltersQuery = (
     filtersQuery: RuleFilter[] = [],
