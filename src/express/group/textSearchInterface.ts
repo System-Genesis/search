@@ -4,6 +4,7 @@ import { IOrganizationGroup } from './interface';
 export type GroupQuery = {
     name: string;
     hierarchy: string;
+    nameAndHierarchy: string;
 };
 
 export type GroupFilters = {

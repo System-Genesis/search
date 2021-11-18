@@ -9,8 +9,8 @@ import { sendToLogger } from '../../rabbit';
 export class ElasticGroupController {
     static async searchByFullname(req: Request, res: Response) {
         const reqFilters = req.query;
-        let { name, hierarchy, ruleFilters, ...userFiltersQuery } = reqFilters;
-        const groupQueryObj: Partial<GroupQuery> = { name: req.query.name!.toString(), hierarchy: req.query.hierarchy?.toString() || '' };
+        let { name, hierarchy, nameAndHierarchy, ruleFilters, ...userFiltersQuery } = reqFilters;
+        const groupQueryObj: Partial<GroupQuery> = { name: req.query.name?.toString(), hierarchy: req.query.hierarchy?.toString(), nameAndHierarchy: nameAndHierarchy?.toString() };
         const userFilters: Partial<GroupFilters> = transformQueryToUserFilters(userFiltersQuery);
         try {
             if (typeof reqFilters.ruleFilters === 'string') {

@@ -121,7 +121,6 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
             }
         }
     }
-    console.log(filters?.ruleFilters);
     for (const key in filters?.ruleFilters) {
         if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
             if (key === 'expanded') {
@@ -273,14 +272,19 @@ export function buildQueryRole(roleId: string, filters?: FilterQueries<Partial<R
 
 export function buildQueryGroup(query: Partial<GroupQuery>, filters: FilterQueries<Partial<GroupFilters>> = { userFilters: {}, ruleFilters: {} }) {
     const { underGroupId, isAlive, status, expanded } = filters.userFilters;
-    const { hierarchy, name } = query;
+    const { hierarchy, name, nameAndHierarchy } = query;
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
     const mustNot: esb.Query[] = [];
     const must: esb.Query[] = [];
-    const excludedFields: string[] = ['directEntities', 'directRoles'];
+    const excludedFields: string[] = ['directEntities', 'directRole'];
     let isExpanded = false;
-
+    if (!!nameAndHierarchy) {
+        should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, nameAndHierarchy).boost(2.4));
+        should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, nameAndHierarchy).fuzziness('AUTO'));
+        should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, nameAndHierarchy).boost(1.2));
+        should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, nameAndHierarchy).fuzziness('AUTO'));
+    }
     if (!!name) {
         should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).boost(1.2));
         should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).fuzziness('AUTO'));

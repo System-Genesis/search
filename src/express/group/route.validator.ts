@@ -8,7 +8,8 @@ const customJoi = Joi.defaults((schema) =>
 
 export const getSearchRequestSchema = customJoi.object({
     query: {
-        name: Joi.string().required().min(2).max(20),
+        name: Joi.string().min(2).max(20),
+        nameAndHierarchy: Joi.string().min(2).max(20),
         hierarchy: Joi.string().min(2).max(20),
         ruleFilters: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         underGroupId: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
