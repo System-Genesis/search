@@ -165,7 +165,7 @@ export const buildQueryDI = (uniqueId: string, filters?: FilterQueries<Partial<D
         // DISPLAYNAME in idsad
         if (!!val && typeof val === 'string') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
-            const exactQuery = esb.matchQuery(textField, val).boost(1.2);
+            const exactQuery = esb.matchQuery(textField, val).boost(1.2).fuzziness('AUTO');
             should.push(exactQuery);
             must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
         }
@@ -280,19 +280,15 @@ export function buildQueryGroup(query: Partial<GroupQuery>, filters: FilterQueri
     const excludedFields: string[] = ['directEntities', 'directRole'];
     let isExpanded = false;
     if (!!nameAndHierarchy) {
-        should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, nameAndHierarchy).boost(2.4));
-        should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, nameAndHierarchy).fuzziness('AUTO'));
-        should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, nameAndHierarchy).boost(1.2));
-        should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, nameAndHierarchy).fuzziness('AUTO'));
+        should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, nameAndHierarchy).fuzziness('AUTO').boost(2.4));
+        should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, nameAndHierarchy).fuzziness('AUTO').boost(1.2));
     }
     if (!!name) {
-        should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).boost(1.2));
-        should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).fuzziness('AUTO'));
+        should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).fuzziness('AUTO').boost(1.2));
         must.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).fuzziness('AUTO').boost(1.2));
     }
     if (!!hierarchy) {
-        should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, hierarchy).boost(1.2));
-        should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, hierarchy).fuzziness('AUTO'));
+        should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, hierarchy).fuzziness('AUTO').boost(1.2));
     }
     if (!!expanded && expanded.includes(true)) {
         isExpanded = true;
