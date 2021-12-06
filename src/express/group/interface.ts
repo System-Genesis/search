@@ -9,6 +9,7 @@ export interface IOrganizationGroup {
     akaUnit: string;
     status: string;
     isLeaf: boolean;
+    source: string;
     createdAt: Date;
     updatedAt: Date;
     directEntities: IEntity[];
