@@ -59,12 +59,13 @@ const mappingsOG = {
         updatedAt: {
             type: 'date',
         },
-        directEntities: {
-            enabled: false,
-        },
-        directRoles: {
-            enabled: false,
-        },
+        // TO DO: remove it after noam finishes
+        // directEntities: {
+        //     enabled: false,
+        // },
+        // directRole: {
+        //     enabled: false,
+        // },
     },
 };
 

@@ -1,12 +1,8 @@
 import * as Joi from 'joi';
 
-const customJoi = Joi.defaults((schema) =>
-    schema.options({
-        stripUnknown: true,
-    }),
-);
 
-export const getSearchRequestSchema = customJoi.object({
+
+export const getSearchRequestSchema = Joi.object({
     query: {
         roleId: Joi.string().required().min(2).max(20),
         ruleFilters: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),

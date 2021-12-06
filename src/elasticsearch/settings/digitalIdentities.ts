@@ -1,10 +1,11 @@
 /* eslint-disable camelcase */
 import config from '../../config/index';
 import { IndexSettings } from './indexSettings';
-import { analyzers, tokenizers, prefix_autocomplete_field_settings } from './generalSettings';
+import { analyzers, tokenizers, prefix_autocomplete_field_settings, normalizers } from './generalSettings';
 
 const { fullTextFieldName } = config.elasticsearch;
 const { autocomplete, autocomplete_search, path_hierarchy } = analyzers;
+const { my_normalizer } = normalizers;
 const { edge_ngram_tokenizer, custom_path_hierarchy } = tokenizers;
 
 const settings = {
@@ -13,6 +14,9 @@ const settings = {
             autocomplete,
             autocomplete_search,
             path_hierarchy,
+        },
+        normalizer: {
+            my_normalizer
         },
         tokenizer: {
             edge_ngram_tokenizer,
@@ -25,15 +29,15 @@ const DImappings = {
     properties: {
         type: {
             type: 'keyword',
+            normalizer: "my_normalizer"
         },
         source: {
             type: 'keyword',
+            normalizer: "my_normalizer"
         },
         mail: {
             type: 'keyword',
-        },
-        uniqueId: {
-            type: 'keyword',
+            normalizer: "my_normalizer",
             fields: {
                 [fullTextFieldName]: prefix_autocomplete_field_settings,
             },

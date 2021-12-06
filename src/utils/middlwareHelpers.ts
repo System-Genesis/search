@@ -28,19 +28,19 @@ export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
                 userFilters[key] = [(query[key] as string).toString() === 'true'] as never;
             }
         } else {
-            if (key === 'digitalIdentities.source') {
+            if (key === 'digitalIdentity.source') {
                 if (!Array.isArray(query[key])) {
                     query[key] = [query[key]];
                 }
                 let allSources: string[] = [];
                 for (const element of query[key]) {
-                    if (config.aliases.hasOwnProperty(element)) {
-                        allSources = allSources.concat((config.aliases[element] as []));
+                    if (config.aliases.hasOwnProperty((element as string).toLowerCase())) {
+                        allSources = allSources.concat((config.aliases[element.toLowerCase()] as []));
                     } else {
                         allSources.push(element);
                     }
                 }
-                userFilters[key] = allSources;
+                userFilters['digitalIdentities.source'] = allSources;
 
             } else {
                 userFilters[key] = Array.isArray(query[key]) ? query[key] : [query[key]];

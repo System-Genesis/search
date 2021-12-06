@@ -1,10 +1,11 @@
 /* eslint-disable camelcase */
 import config from '../../config/index';
 import { IndexSettings } from './indexSettings';
-import { analyzers, tokenizers, prefix_autocomplete_field_settings } from './generalSettings';
+import { analyzers, tokenizers, prefix_autocomplete_field_settings, normalizers } from './generalSettings';
 
 const { fullTextFieldName } = config.elasticsearch;
 const { autocomplete, autocomplete_search, path_hierarchy } = analyzers;
+const { my_normalizer } = normalizers;
 const { edge_ngram_tokenizer, custom_path_hierarchy } = tokenizers;
 
 const settings = {
@@ -13,6 +14,9 @@ const settings = {
             autocomplete,
             autocomplete_search,
             path_hierarchy,
+        },
+        normalizer: {
+            my_normalizer
         },
         tokenizer: {
             edge_ngram_tokenizer,
@@ -43,6 +47,7 @@ const entityMappings = {
         },
         entityType: {
             type: 'keyword',
+            normalizer: "my_normalizer"
         },
         identityCard: {
             type: 'keyword',
@@ -61,6 +66,7 @@ const entityMappings = {
         },
         status: {
             type: 'keyword',
+            normalizer: "my_normalizer"
         },
         dischargeDay: {
             type: 'date',
@@ -74,9 +80,11 @@ const entityMappings = {
         },
         rank: {
             type: 'keyword',
+            normalizer: "my_normalizer"
         },
         mail: {
             type: 'keyword',
+            normalizer: "my_normalizer"
         },
         job: {
             enabled: false,
@@ -129,9 +137,11 @@ const entityMappings = {
                 },
                 source: {
                     type: 'keyword',
+                    normalizer: "my_normalizer"
                 },
                 mail: {
                     type: 'keyword',
+                    normalizer: "my_normalizer"
                 },
                 uniqueId: {
                     type: 'keyword',

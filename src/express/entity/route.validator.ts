@@ -65,18 +65,14 @@ export const EntityFilters = Joi.object({
     responsibility: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
     hierarchyPath: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
 });
-const customJoi = Joi.defaults((schema) =>
-    schema.options({
-        stripUnknown: true,
-    }),
-);
-export const getSearchRequestSchema = customJoi.object({
+
+export const getSearchRequestSchema = Joi.object({
     query: {
         fullName: Joi.string().required().min(2).max(20),
         ruleFilters: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         status: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         entityType: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
-        'digitalIdentities.source': Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
+        'digitalIdentity.source': Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         'digitalIdentities.mail': Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         mail: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         rank: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
