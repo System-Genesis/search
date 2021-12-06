@@ -271,7 +271,7 @@ export function buildQueryRole(roleId: string, filters?: FilterQueries<Partial<R
 }
 
 export function buildQueryGroup(query: Partial<GroupQuery>, filters: FilterQueries<Partial<GroupFilters>> = { userFilters: {}, ruleFilters: {} }) {
-    const { underGroupId, isAlive, status, expanded } = filters.userFilters;
+    const { underGroupId, isAlive, status, expanded, source } = filters.userFilters;
     const { hierarchy, name, nameAndHierarchy } = query;
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
@@ -323,6 +323,18 @@ export function buildQueryGroup(query: Partial<GroupQuery>, filters: FilterQueri
         const mustArr: string[] = Array.isArray(status) ? filterMustArr(status) : [];
         if (mustArr.length !== 0) {
             const termQuery = esb.termsQuery('status', mustArr);
+            filter.push(termQuery);
+        }
+    }
+    if (!!source && source.length !== 0) {
+        const mustNotArr: string[] = Array.isArray(source) ? filterMustNotArr(source) : [];
+        if (mustNotArr.length !== 0) {
+            const termNotQuery = esb.termsQuery('source', mustNotArr);
+            mustNot.push(termNotQuery);
+        }
+        const mustArr: string[] = Array.isArray(source) ? filterMustArr(source) : [];
+        if (mustArr.length !== 0) {
+            const termQuery = esb.termsQuery('source', mustArr);
             filter.push(termQuery);
         }
     }
