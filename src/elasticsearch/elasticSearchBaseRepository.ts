@@ -66,7 +66,7 @@ export abstract class ElasticSearchBaseRepository<T> {
         this._queryConfig = queryConfig;
     }
 
-    protected async search(query: Object, size: number = this._queryConfig.resultSize) {
+    protected async search(query?: Object, size: number = this._queryConfig.resultSize) {
         const res: ApiResponse<SearchResponse<T>> = await this._client.search({
             size,
             body: query,

@@ -68,14 +68,15 @@ const mappingsOG = {
         },
         diPrefix: {
             type: 'keyword'
-        }
+        },
+
         // TO DO: remove it after noam finishes
-        // directEntities: {
-        //     enabled: false,
-        // },
-        // directRole: {
-        //     enabled: false,
-        // },
+        directEntities: {
+            enabled: false,
+        },
+        directRole: {
+            enabled: false,
+        },
     },
 };
 

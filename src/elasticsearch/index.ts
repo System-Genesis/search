@@ -271,7 +271,6 @@ export function buildQueryRole(roleId: string, filters?: FilterQueries<Partial<R
 }
 
 export function buildQueryGroup(query: Partial<GroupQuery>, filters: FilterQueries<Partial<GroupFilters>> = { userFilters: {}, ruleFilters: {} }) {
-    const { underGroupId, isAlive, status, expanded, source } = filters.userFilters;
     const { hierarchy, name, nameAndHierarchy } = query;
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
@@ -290,54 +289,50 @@ export function buildQueryGroup(query: Partial<GroupQuery>, filters: FilterQueri
     if (!!hierarchy) {
         should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, hierarchy).fuzziness('AUTO').boost(1.2));
     }
-    if (!!expanded && expanded.includes(true)) {
-        isExpanded = true;
+    for (const key in filters.userFilters) {
+        if (Object.prototype.hasOwnProperty.call(filters?.userFilters, key)) {
+            if (key === 'expanded') {
+                if (filters!.userFilters[key]?.includes(true)) {
+                    isExpanded = true;
+                }
+            } else {
+                if (key === 'status') {
+                    if (filters?.userFilters[key] !== undefined && (filters?.userFilters[key] as []).length !== 0) {
+                        for (const alive of filters?.userFilters[key] as []) {
+                            const typeAlive: string = (alive as any).toString() === 'true' ? 'active' : 'inactive';
+                            filter.push(esb.termQuery('status', typeAlive));
+                        }
+                    }
+                } else if (key === 'underGroupId') {
+                    if (filters?.userFilters[key] !== undefined && (filters?.userFilters[key] as []).length !== 0) {
+                        const mustNotArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters.userFilters[key] as []) : [];
+                        if (mustNotArr.length !== 0) {
+                            const termNotQuery = esb.termsQuery('ancestors', mustNotArr);
+                            mustNot.push(termNotQuery);
+                        }
+                        const mustArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters.userFilters[key] as []) : [];
+                        if (mustArr.length !== 0) {
+                            const termQuery = esb.termsQuery('ancestors', mustArr);
+                            filter.push(termQuery);
+                        }
+                    }
+                } else {
+                    const mustNotArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters!.userFilters[key]) : [];
+                    if (mustNotArr.length !== 0) {
+                        const termNotQuery = esb.termsQuery(key, mustNotArr);
+                        mustNot.push(termNotQuery);
+                    }
+                    const mustArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters!.userFilters[key]) : [];
+                    if (mustArr.length !== 0) {
+                        const termQuery = esb.termsQuery(key, mustArr);
+                        filter.push(termQuery);
+                    }
+                }
+            }
+        }
     }
 
-    if (!!underGroupId && underGroupId.length !== 0) {
-        if (underGroupId !== undefined && underGroupId.length !== 0) {
-            const mustNotArr: string[] = Array.isArray(underGroupId) ? filterMustNotArr(underGroupId) : [];
-            if (mustNotArr.length !== 0) {
-                const termNotQuery = esb.termsQuery('ancestors', mustNotArr);
-                mustNot.push(termNotQuery);
-            }
-            const mustArr: string[] = Array.isArray(underGroupId) ? filterMustArr(underGroupId) : [];
-            if (mustArr.length !== 0) {
-                const termQuery = esb.termsQuery('ancestors', mustArr);
-                filter.push(termQuery);
-            }
-        }
-    }
-    if (isAlive !== undefined && isAlive.length !== 0) {
-        for (const alive of isAlive) {
-            const typeAlive: string = alive.toString() === 'true' ? 'active' : 'inactive';
-            filter.push(esb.termQuery('status', typeAlive));
-        }
-    }
-    if (!!status && status.length !== 0) {
-        const mustNotArr: string[] = Array.isArray(status) ? filterMustNotArr(status) : [];
-        if (mustNotArr.length !== 0) {
-            const termNotQuery = esb.termsQuery('status', mustNotArr);
-            mustNot.push(termNotQuery);
-        }
-        const mustArr: string[] = Array.isArray(status) ? filterMustArr(status) : [];
-        if (mustArr.length !== 0) {
-            const termQuery = esb.termsQuery('status', mustArr);
-            filter.push(termQuery);
-        }
-    }
-    if (!!source && source.length !== 0) {
-        const mustNotArr: string[] = Array.isArray(source) ? filterMustNotArr(source) : [];
-        if (mustNotArr.length !== 0) {
-            const termNotQuery = esb.termsQuery('source', mustNotArr);
-            mustNot.push(termNotQuery);
-        }
-        const mustArr: string[] = Array.isArray(source) ? filterMustArr(source) : [];
-        if (mustArr.length !== 0) {
-            const termQuery = esb.termsQuery('source', mustArr);
-            filter.push(termQuery);
-        }
-    }
+
     for (const key in filters?.ruleFilters) {
         if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
             if (key === 'expanded') {
