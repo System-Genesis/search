@@ -42,6 +42,13 @@ const DImappings = {
                 [fullTextFieldName]: prefix_autocomplete_field_settings,
             },
         },
+        uniqueId: {
+            type: 'keyword',
+            normalizer: "my_normalizer",
+            fields: {
+                [fullTextFieldName]: prefix_autocomplete_field_settings,
+            },
+        },
         entityId: {
             type: 'keyword',
         },
