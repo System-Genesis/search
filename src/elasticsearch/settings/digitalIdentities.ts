@@ -1,12 +1,12 @@
 /* eslint-disable camelcase */
 import config from '../../config/index';
 import { IndexSettings } from './indexSettings';
-import { analyzers, tokenizers, prefix_autocomplete_field_settings, normalizers } from './generalSettings';
+import { analyzers, tokenizersDI, prefix_autocomplete_field_settings, normalizers } from './generalSettings';
 
 const { fullTextFieldName } = config.elasticsearch;
 const { autocomplete, autocomplete_search, path_hierarchy } = analyzers;
 const { my_normalizer } = normalizers;
-const { edge_ngram_tokenizer, custom_path_hierarchy } = tokenizers;
+const { edge_ngram_tokenizer, custom_path_hierarchy } = tokenizersDI;
 
 const settings = {
     analysis: {
