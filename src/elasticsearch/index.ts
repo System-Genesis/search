@@ -165,9 +165,9 @@ export const buildQueryDI = (uniqueId: string, filters?: FilterQueries<Partial<D
         // DISPLAYNAME in idsad
         if (!!val && typeof val === 'string') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
-            const exactQuery = esb.matchQuery(textField, val).boost(1.2).fuzziness('AUTO');
+            const exactQuery = esb.matchQuery(textField, val).boost(1)//.boost(1.2).fuzziness('AUTO');
             should.push(exactQuery);
-            must.push(esb.matchQuery(textField, val).fuzziness('AUTO').boost(1.2));
+            must.push(esb.matchQuery(textField, val).boost(1))//.fuzziness('AUTO').boost(1.2));
         }
     }
     for (const key in filters?.userFilters) {
