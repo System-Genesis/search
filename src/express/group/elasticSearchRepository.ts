@@ -11,15 +11,16 @@ import { GroupFilters, GroupQuery, OrganizationGroupTextSearch } from './textSea
 const {
     indexNames: { organizationGroups: _indexName },
 } = config.elasticsearch;
+const excludedFields = ['directEntities', 'directRole'];
 
 class ElasticGroupRepository extends ElasticSearchBaseRepository<IOrganizationGroup> implements OrganizationGroupTextSearch {
+
     constructor(indexName: string = _indexName, elasticClient?: Client, queryConfig?: QueryConfig) {
-        super(indexName, elasticClient, queryConfig);
+        super(indexName, elasticClient, queryConfig, excludedFields);
     }
 
     async searchByNameAndHierarchy(query: Partial<GroupQuery>, filters: FilterQueries<Partial<GroupFilters>> = { userFilters: {}, ruleFilters: {} }) {
-        const response = await this.search(buildQueryGroup(query, filters));
-
+        const response = await this.search(buildQueryGroup(query, filters, this._excludedFields));
         return response;
     }
 }

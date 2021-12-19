@@ -79,13 +79,11 @@ export async function readJsonAndWriteElastic(path: string, modelType: string, i
     }
 }
 
-export function buildQuery(displayName: string, filters?: FilterQueries<Partial<EntityFilters>>) {
+export function buildQuery(displayName: string, filters?: FilterQueries<Partial<EntityFilters>>, excludedFields: string[] = [], hiddenFields: string[] = []) {
     const must: esb.Query[] = [];
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
     const mustNot: esb.Query[] = [];
-    const excludedFields: string[] = ['digitalIdentities'];
-    const hiddenFields: string[] = ['hierarchyIds', 'pictures.meta.path'];
     const query = {
         fullName: displayName,
     };
@@ -93,7 +91,6 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, val] of Object.entries(query)) {
-        // DISPLAYNAME in if
         if (!!val && typeof val === 'string') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
             const exactQuery = esb.matchQuery(textField, val).boost(1.2).fuzziness('AUTO');
@@ -149,12 +146,11 @@ export function buildQuery(displayName: string, filters?: FilterQueries<Partial<
     return requestBody;
 }
 
-export const buildQueryDI = (uniqueId: string, filters?: FilterQueries<Partial<DigitalIdentityFilters>>) => {
+export const buildQueryDI = (uniqueId: string, filters?: FilterQueries<Partial<DigitalIdentityFilters>>, excludedFields: string[] = []) => {
     const must: esb.Query[] = [];
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
     const mustNot: esb.Query[] = [];
-    const excludedFields: string[] = ['role'];
     const query = {
         uniqueId,
     };
@@ -162,7 +158,6 @@ export const buildQueryDI = (uniqueId: string, filters?: FilterQueries<Partial<D
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, val] of Object.entries(query)) {
-        // DISPLAYNAME in idsad
         if (!!val && typeof val === 'string') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
             const exactQuery = esb.matchQuery(textField, val).boost(1)//.boost(1.2).fuzziness('AUTO');
@@ -223,7 +218,6 @@ export function buildQueryRole(roleId: string, filters?: FilterQueries<Partial<R
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
     const mustNot: esb.Query[] = [];
-
     const query = {
         roleId,
     };
@@ -270,13 +264,12 @@ export function buildQueryRole(roleId: string, filters?: FilterQueries<Partial<R
     return requestBody;
 }
 
-export function buildQueryGroup(query: Partial<GroupQuery>, filters: FilterQueries<Partial<GroupFilters>> = { userFilters: {}, ruleFilters: {} }) {
+export function buildQueryGroup(query: Partial<GroupQuery>, filters: FilterQueries<Partial<GroupFilters>> = { userFilters: {}, ruleFilters: {} }, excludedFields: string[] = []) {
     const { hierarchy, name, nameAndHierarchy } = query;
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
     const mustNot: esb.Query[] = [];
     const must: esb.Query[] = [];
-    const excludedFields: string[] = ['directEntities', 'directRole'];
     let isExpanded = false;
     if (!!nameAndHierarchy) {
         should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, nameAndHierarchy).fuzziness('AUTO').boost(2.4));

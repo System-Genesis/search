@@ -21,11 +21,9 @@ class Server {
 
     static createExpressApp() {
         const app = express();
-
         app.use(helmet());
         app.use(express.json());
         app.use(express.urlencoded({ extended: true }));
-
         app.use(logger('dev'));
         app.use(appRouter);
         // app.use(apm.middleware.connect()) MIDDLEWARE COOL STUFF
