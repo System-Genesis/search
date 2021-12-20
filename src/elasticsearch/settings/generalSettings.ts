@@ -14,7 +14,7 @@ export const analyzers = {
     autocomplete_search: {
         tokenizer: 'standard',
         filter: ['lowercase'],
-        type: 'custom'
+        type: 'custom',
     },
     path_hierarchy: {
         tokenizer: 'custom_path_hierarchy',
@@ -22,10 +22,10 @@ export const analyzers = {
 };
 export const normalizers = {
     my_normalizer: {
-        type: "custom",
-        filter: ["lowercase", "asciifolding"]
-    }
-}
+        type: 'custom',
+        filter: ['lowercase', 'asciifolding'],
+    },
+};
 
 export const tokenizers = {
     edge_ngram_tokenizer: {
@@ -46,7 +46,7 @@ export const tokenizersDI = {
         min_gram: 2,
         type: 'edge_ngram',
         //  token_chars: ['letter', 'digit'],
-        // custom_token_chars: '+-_',
+        custom_token_chars: '+-_@.',
     },
     custom_path_hierarchy: {
         type: 'path_hierarchy',

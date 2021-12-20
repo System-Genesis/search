@@ -28,6 +28,7 @@ export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
                 userFilters[key] = [(query[key] as string).toString() === 'true'] as never;
             }
         } else {
+            // eslint-disable-next-line no-lonely-if
             if (key === 'digitalIdentity.source') {
                 if (!Array.isArray(query[key])) {
                     query[key] = [query[key]];
@@ -35,13 +36,12 @@ export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
                 let allSources: string[] = [];
                 for (const element of query[key]) {
                     if (config.aliases.hasOwnProperty((element as string).toLowerCase())) {
-                        allSources = allSources.concat((config.aliases[element.toLowerCase()] as []));
+                        allSources = allSources.concat(config.aliases[element.toLowerCase()] as []);
                     } else {
                         allSources.push(element);
                     }
                 }
                 userFilters['digitalIdentities.source'] = allSources;
-
             } else {
                 userFilters[key] = Array.isArray(query[key]) ? query[key] : [query[key]];
             }
@@ -49,7 +49,6 @@ export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
     }
     return userFilters;
 }
-
 
 export const extractEntityFiltersQuery = (
     filtersQuery: RuleFilter[] = [],

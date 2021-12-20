@@ -64,12 +64,13 @@ export abstract class ElasticSearchBaseRepository<T> {
 
     protected _hiddenFields: string[];
 
-    constructor(indexName: string,
+    constructor(
+        indexName: string,
         elasticClient: Client = defaultEsClient,
         queryConfig: QueryConfig = defaultQueryConfig,
         excludedFields: string[] = [],
-        hiddenFields: string[] = []) {
-
+        hiddenFields: string[] = [],
+    ) {
         this._indexName = indexName;
         this._client = elasticClient;
         this._queryConfig = queryConfig;

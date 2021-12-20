@@ -16,7 +16,7 @@ const settings = {
             path_hierarchy,
         },
         normalizer: {
-            my_normalizer
+            my_normalizer,
         },
         tokenizer: {
             edge_ngram_tokenizer,
@@ -29,22 +29,22 @@ const DImappings = {
     properties: {
         type: {
             type: 'keyword',
-            normalizer: "my_normalizer"
+            normalizer: 'my_normalizer',
         },
         source: {
             type: 'keyword',
-            normalizer: "my_normalizer"
+            normalizer: 'my_normalizer',
         },
         mail: {
             type: 'keyword',
-            normalizer: "my_normalizer",
+            normalizer: 'my_normalizer',
             fields: {
                 [fullTextFieldName]: prefix_autocomplete_field_settings,
             },
         },
         uniqueId: {
             type: 'keyword',
-            normalizer: "my_normalizer",
+            normalizer: 'my_normalizer',
             fields: {
                 [fullTextFieldName]: prefix_autocomplete_field_settings,
             },
