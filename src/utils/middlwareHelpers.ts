@@ -37,7 +37,7 @@ export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
                     allSources.push(element);
                 }
             }
-            userFilters[key] = allSources;
+            userFilters[key === 'digitalIdentity.source' ? 'digitalIdentities.source' : key] = allSources;
         } else {
             userFilters[key] = Array.isArray(query[key]) ? query[key] : [query[key]];
         }
