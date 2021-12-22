@@ -13,14 +13,12 @@ const {
 const excludedFields: string[] = ['role'];
 
 export class ElasticDIRepository extends ElasticSearchBaseRepository<IDigitalIdentity> implements DigitalIdentityTextSearch {
-
-
     constructor(indexName: string = _indexName, elasticClient?: Client, queryConfig?: QueryConfig) {
         super(indexName, elasticClient, queryConfig, excludedFields);
     }
 
     async searchByFullName(uniqueId: string, filters?: FilterQueries<Partial<DigitalIdentityFilters>>) {
-        return await this.search(buildQueryDI(uniqueId, filters, this._excludedFields));
+        return await this.search(buildQueryDI(uniqueId, filters, this.excludedFields));
     }
 }
 

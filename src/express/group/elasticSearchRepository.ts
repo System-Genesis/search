@@ -20,7 +20,7 @@ class ElasticGroupRepository extends ElasticSearchBaseRepository<IOrganizationGr
 
     async searchByNameAndHierarchy(query: Partial<GroupQuery>, filters: FilterQueries<Partial<GroupFilters>> = { userFilters: {}, ruleFilters: {} }) {
         // eslint-disable-next-line no-underscore-dangle
-        const response = await this.search(buildQueryGroup(query, filters, this._excludedFields));
+        const response = await this.search(buildQueryGroup(query, filters, this.excludedFields));
         return response;
     }
 }

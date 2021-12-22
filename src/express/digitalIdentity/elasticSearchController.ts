@@ -2,9 +2,9 @@
 import { Response, Request } from 'express';
 import { sendToLogger } from '../../rabbit';
 import { FilterQueries, RuleFilter } from '../../types';
-import { extractDIFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
+import { extractFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
 import ElasticDIRepository from './elasticSearchRepository';
-import { DigitalIdentityFilters } from './textSearchInterface';
+import { DigitalIdentityFilters, digitalIdentityMapFieldType } from './textSearchInterface';
 
 export class ElasticDIController {
     static async searchByFullname(req: Request, res: Response) {
@@ -18,7 +18,11 @@ export class ElasticDIController {
                 ruleFilters = JSON.parse(ruleFilters!.toString());
             }
 
-            const filteredObject: FilterQueries<Partial<DigitalIdentityFilters>> = extractDIFiltersQuery(ruleFilters as RuleFilter[], userFilters);
+            const filteredObject: FilterQueries<Partial<DigitalIdentityFilters>> = extractFiltersQuery<DigitalIdentityFilters>(
+                ruleFilters as RuleFilter[],
+                userFilters,
+                digitalIdentityMapFieldType,
+            );
 
             const response = await ElasticDIRepository.searchByFullName(uniqueId!.toString(), filteredObject);
 

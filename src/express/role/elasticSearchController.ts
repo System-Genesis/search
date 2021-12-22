@@ -1,8 +1,8 @@
 /* eslint-disable prefer-const */
 import { Response, Request } from 'express';
 import ElasticRoleRepository from './elasticSearchRepository';
-import { RoleFilters } from './textSearchInterface';
-import { extractRoleFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
+import { RoleFilters, roleMapFieldType } from './textSearchInterface';
+import { extractFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
 import { FilterQueries, RuleFilter } from '../../types';
 import { sendToLogger } from '../../rabbit';
 
@@ -17,7 +17,11 @@ export class ElasticRoleController {
                 ruleFilters = JSON.parse(ruleFilters!.toString());
             }
 
-            const filteredObject: FilterQueries<Partial<RoleFilters>> = extractRoleFiltersQuery(ruleFilters as RuleFilter[], userFilters);
+            const filteredObject: FilterQueries<Partial<RoleFilters>> = extractFiltersQuery<RoleFilters>(
+                ruleFilters as RuleFilter[],
+                userFilters,
+                roleMapFieldType,
+            );
 
             const response = await ElasticRoleRepository.searchByFullName(roleId!.toString(), filteredObject);
             res.json(response);

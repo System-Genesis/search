@@ -78,6 +78,14 @@ export abstract class ElasticSearchBaseRepository<T> {
         this._hiddenFields = hiddenFields;
     }
 
+    public get excludedFields(): string[] {
+        return this._excludedFields;
+    }
+
+    public get hiddenFields(): string[] {
+        return this._hiddenFields;
+    }
+
     protected async search(query?: Object, size: number = this._queryConfig.resultSize) {
         const res: ApiResponse<SearchResponse<T>> = await this._client.search({
             size,

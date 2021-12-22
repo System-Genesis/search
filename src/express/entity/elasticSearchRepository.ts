@@ -28,15 +28,13 @@ const excludedFields: string[] = ['digitalIdentities'];
 const hiddenFields: string[] = ['hierarchyIds', 'pictures.meta.path'];
 
 class ElasticEntityRepository extends ElasticSearchBaseRepository<EntitySource> implements EntityTextSearch {
-
-
     constructor(indexName: string = _indexName, elasticClient?: Client, queryConfig?: QueryConfig) {
         super(indexName, elasticClient, queryConfig, excludedFields, hiddenFields);
     }
 
     async searchByFullName(fullName: string, filters?: FilterQueries<Partial<EntityFilters>>) {
         // eslint-disable-next-line no-return-await
-        return await this.search(buildQuery(fullName, filters, this._excludedFields, this._hiddenFields));
+        return await this.search(buildQuery(fullName, filters, this.excludedFields, this.hiddenFields));
     }
 
     async insertElastic(entity: EntitySource | EntitySource[]): Promise<void> {

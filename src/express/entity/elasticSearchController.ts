@@ -2,8 +2,8 @@
 import { Response, Request } from 'express';
 import ElasticEntityRepository from './elasticSearchRepository';
 import { IEntity } from './interface';
-import { EntityFilters } from './textSearchInterface';
-import { extractEntityFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
+import { EntityFilters, entityMapFieldType } from './textSearchInterface';
+import { extractFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
 import { FilterQueries, RuleFilter } from '../../types';
 import { sendToLogger } from '../../rabbit';
 
@@ -17,7 +17,11 @@ export class ElasticEntityController {
             if (typeof reqFilters.ruleFilters === 'string') {
                 ruleFilters = JSON.parse(ruleFilters!.toString());
             }
-            const filteredObject: FilterQueries<Partial<EntityFilters>> = extractEntityFiltersQuery(ruleFilters as RuleFilter[], userFilters);
+            const filteredObject: FilterQueries<Partial<EntityFilters>> = extractFiltersQuery<EntityFilters>(
+                ruleFilters as RuleFilter[],
+                userFilters,
+                entityMapFieldType,
+            );
             const response = await ElasticEntityRepository.searchByFullName(fullName!.toString(), filteredObject);
             res.json(response);
         } catch (err) {

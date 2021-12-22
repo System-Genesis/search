@@ -6,6 +6,7 @@ export type RoleFilters = {
     hierarchy: string[];
     source: string[];
     directGroup: string[];
+    clearance: string[];
 };
 
 export interface RoleTextSearch {
@@ -17,4 +18,5 @@ export const roleMapFieldType: Map<string, Map<string, string>> = new Map<string
     ['hierarchy', new Map<string, string>([['role', 'hierarchy']])],
     ['source', new Map<string, string>([['role', 'source']])],
     ['directGroup', new Map<string, string>([['role', 'directGroup']])],
+    ['clearance', new Map<string, string>([['role', 'clearance']])],
 ]);
