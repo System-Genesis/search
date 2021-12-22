@@ -25,7 +25,7 @@ export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
             } else {
                 userFilters[key] = [(query[key] as string).toString() === 'true'] as never;
             }
-        } else if (key === 'digitalIdentity.source') {
+        } else if (key === 'digitalIdentity.source' || key === 'source') {
             if (!Array.isArray(query[key])) {
                 query[key] = [query[key]];
             }
@@ -37,7 +37,7 @@ export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
                     allSources.push(element);
                 }
             }
-            userFilters['digitalIdentities.source'] = allSources;
+            userFilters[key] = allSources;
         } else {
             userFilters[key] = Array.isArray(query[key]) ? query[key] : [query[key]];
         }
