@@ -1,7 +1,5 @@
 import * as Joi from 'joi';
 
-
-
 export const getSearchRequestSchema = Joi.object({
     query: {
         name: Joi.string().min(2),
