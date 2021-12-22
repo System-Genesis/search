@@ -6,6 +6,8 @@
 import config from '../config';
 import { RuleFilter, FilterQueries } from '../types';
 
+const keysToSplit = ['rank', 'source', 'digitalIdentity.source', 'entityType', 'type', 'akaUnit', 'jobTitle'];
+
 export const filterMustNotArr = (array: any[]): any[] => {
     const newArr: any[] = array.filter((element) => (element as any).toString().startsWith('!'));
     const newArrWithoutNot: any[] = newArr.map((element) => element.slice(1));
@@ -15,10 +17,19 @@ export const filterMustArr = (array: any[]): any[] => {
     const newArr: any[] = array.filter((element) => !(element as any).toString().startsWith('!'));
     return newArr;
 };
+
+export function splitQueryValue(value: any) {
+    const result = !Array.isArray(value) ? value?.split(',') : value;
+    return result;
+}
+
 export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
     let userFilters: Partial<T> = {};
     // let obj: ExcludedTypes<T, T> = deepCopy(query as T);
     for (let key in query) {
+        if (keysToSplit.includes(key)) {
+            query[key] = splitQueryValue(query[key]);
+        }
         if (key === 'expanded') {
             if (Array.isArray(query[key])) {
                 userFilters[key] = (query[key] as []).map((element) => (element as string).toString() === 'true') as never;
