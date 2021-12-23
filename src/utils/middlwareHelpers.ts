@@ -40,10 +40,11 @@ export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
             if (!Array.isArray(query[key])) {
                 query[key] = [query[key]];
             }
+            let aliasSource = key === 'source' ? config.aliases.di : config.aliases.entity;
             let allSources: string[] = [];
             for (const element of query[key]) {
-                if (config.aliases.hasOwnProperty((element as string).toLowerCase())) {
-                    allSources = allSources.concat(config.aliases[element.toLowerCase()] as []);
+                if (aliasSource.hasOwnProperty((element as string).toLowerCase())) {
+                    allSources = allSources.concat(aliasSource[element.toLowerCase()] as []);
                 } else {
                     allSources.push(element);
                 }

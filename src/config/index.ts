@@ -15,7 +15,10 @@ const config = {
         port: env.get('PORT').required().asPortNumber(),
         isMock: env.get('IS_MOCK').default('false').asString().toLowerCase() === 'true',
     },
-    aliases: env.get('ALIASES').required().asJson(),
+    aliases: {
+        di: env.get('ALIASES_DI').required().asJson(),
+        entity: env.get('ALIASES_ENTITY').required().asJson(),
+    },
     elasticsearch: {
         indexInitRetries: 3,
         nodes: env.get('ELASTICSEARCH_HOSTS').required().asString().split(','),
