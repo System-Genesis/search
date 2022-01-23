@@ -4,7 +4,8 @@ import ElasticGroupRepository from './elasticSearchRepository';
 import { GroupFilters, GroupQuery, groupMapFieldType } from './textSearchInterface';
 import { extractFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
 import { FilterQueries, RuleFilter } from '../../types';
-import { sendToLogger } from '../../rabbit';
+import { GroupDTO } from './dto';
+import ResponseHandler from '../../utils/responseHandler';
 
 export class ElasticGroupController {
     static async searchByFullname(req: Request, res: Response) {
@@ -16,22 +17,18 @@ export class ElasticGroupController {
             nameAndHierarchy: nameAndHierarchy?.toString(),
         };
         const userFilters: Partial<GroupFilters> = transformQueryToUserFilters(userFiltersQuery);
-        try {
-            if (typeof reqFilters.ruleFilters === 'string') {
-                ruleFilters = JSON.parse(ruleFilters!.toString());
-            }
-            const filteredObject: FilterQueries<Partial<GroupFilters>> = extractFiltersQuery<GroupFilters>(
-                ruleFilters as RuleFilter[],
-                userFilters,
-                groupMapFieldType,
-            );
 
-            const response = await ElasticGroupRepository.searchByNameAndHierarchy(groupQueryObj, filteredObject);
-            res.json(response);
-        } catch (err) {
-            await sendToLogger('error', (err as any).message);
-            res.json((err as any).message);
+        if (typeof reqFilters.ruleFilters === 'string') {
+            ruleFilters = JSON.parse(ruleFilters!.toString());
         }
+        const filteredObject: FilterQueries<Partial<GroupFilters>> = extractFiltersQuery<GroupFilters>(
+            ruleFilters as RuleFilter[],
+            userFilters,
+            groupMapFieldType,
+        );
+
+        const response = await ElasticGroupRepository.searchByNameAndHierarchy(groupQueryObj, filteredObject);
+        ResponseHandler.success<GroupDTO[]>(res, response);
     }
 }
 

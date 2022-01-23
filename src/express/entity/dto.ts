@@ -1,27 +1,11 @@
-import { Schema } from 'mongoose';
-import { IDigitalIdentity } from '../digitalIdentity/interface';
+import { DigitalIdentityDTO } from '../digitalIdentity/dto';
+import { ProfilePictureData } from './interface';
 
-export type ProfilePictureData = {
-    path: string;
-    format: string;
-    updatedAt?: Date;
-    createdAt?: Date;
-};
-
-export type pictures = {
-    profile: {
-        // TODO: add url? pictures DTO?
-        meta: ProfilePictureData;
-    };
-};
-
-interface IEntity {
-    // Entity's saved in denormalized db
-    _id: Schema.Types.ObjectId;
+export interface EntityDTO {
+    // Entity as it should be returned to client
     id: string;
     displayName: string;
     hierarchy: string;
-    hierarchyIds: string[];
     directGroup: string;
     entityType: string; // enum
     identityCard: string;
@@ -50,7 +34,5 @@ interface IEntity {
             meta: ProfilePictureData;
         };
     };
-    digitalIdentities: [IDigitalIdentity];
+    digitalIdentities: DigitalIdentityDTO;
 }
-
-export { IEntity };

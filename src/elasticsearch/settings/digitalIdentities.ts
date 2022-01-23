@@ -61,6 +61,9 @@ const DImappings = {
         isRoleAttachable: {
             type: 'boolean',
         },
+        upn: {
+            type: 'keyword',
+        },
         role: {
             properties: {
                 roleId: {

@@ -1,10 +1,10 @@
-export interface IRole {
-    // role as it saved in db
+export interface RoleDTO {
+    // role as it should be returned to client
     roleId: string;
     jobTitle: string;
-    clearance: string;
     digitalIdentityUniqueId: string;
     directGroup: string;
+    clearance: string;
     hierarchy: string;
     hierarchyIds: string[];
     createdAt: Date;

@@ -5,20 +5,10 @@ import { Client } from '@elastic/elasticsearch';
 import config from '../../config';
 import { ElasticSearchBaseRepository, QueryConfig } from '../../elasticsearch/elasticSearchBaseRepository';
 // import { IDigitalIdentity } from '../digitalIdentity/interface';
-import { IEntity, ProfilePictureMeta } from './interface';
 import { EntityFilters, EntityTextSearch } from './textSearchInterface';
 import { buildQuery } from '../../elasticsearch/index';
 import { FilterQueries } from '../../types';
-
-export type EntitySource = Omit<IEntity, 'pictures'> & {
-    hierarchyPath: string;
-    pictures?: {
-        profile?: {
-            url: string;
-            meta: ProfilePictureMeta & { path?: string };
-        };
-    };
-};
+import { IEntity } from './interface';
 
 const {
     indexNames: { entities: _indexName },
@@ -27,7 +17,7 @@ const {
 const excludedFields: string[] = ['digitalIdentities'];
 const hiddenFields: string[] = ['hierarchyIds', 'pictures.meta.path'];
 
-class ElasticEntityRepository extends ElasticSearchBaseRepository<EntitySource> implements EntityTextSearch {
+class ElasticEntityRepository extends ElasticSearchBaseRepository<IEntity> implements EntityTextSearch {
     constructor(indexName: string = _indexName, elasticClient?: Client, queryConfig?: QueryConfig) {
         super(indexName, elasticClient, queryConfig, excludedFields, hiddenFields);
     }
@@ -37,7 +27,7 @@ class ElasticEntityRepository extends ElasticSearchBaseRepository<EntitySource> 
         return await this.search(buildQuery(fullName, filters, this.excludedFields, this.hiddenFields));
     }
 
-    async insertElastic(entity: EntitySource | EntitySource[]): Promise<void> {
+    async insertElastic(entity: IEntity | IEntity[]): Promise<void> {
         if (!Array.isArray(entity)) {
             await this.insert(entity, entity.id);
         } else {

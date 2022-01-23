@@ -1,9 +1,11 @@
 /* eslint-disable prefer-const */
 import { Response, Request } from 'express';
-import { sendToLogger } from '../../rabbit';
 import { FilterQueries, RuleFilter } from '../../types';
 import { extractFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
+import ResponseHandler from '../../utils/responseHandler';
+import { DigitalIdentityDTO } from './dto';
 import ElasticDIRepository from './elasticSearchRepository';
+import * as ApiErrors from '../../core/ApiErrors';
 import { DigitalIdentityFilters, digitalIdentityMapFieldType } from './textSearchInterface';
 
 export class ElasticDIController {
@@ -13,24 +15,21 @@ export class ElasticDIController {
 
         const userFilters: Partial<DigitalIdentityFilters> = transformQueryToUserFilters(userFilterss);
 
-        try {
-            if (typeof reqFilters.ruleFilters === 'string') {
-                ruleFilters = JSON.parse(ruleFilters!.toString());
-            }
-
-            const filteredObject: FilterQueries<Partial<DigitalIdentityFilters>> = extractFiltersQuery<DigitalIdentityFilters>(
-                ruleFilters as RuleFilter[],
-                userFilters,
-                digitalIdentityMapFieldType,
-            );
-
-            const response = await ElasticDIRepository.searchByFullName(uniqueId!.toString(), filteredObject);
-
-            res.json(response);
-        } catch (err) {
-            await sendToLogger('error', (err as any).message);
-            res.json((err as any).message);
+        if (typeof reqFilters.ruleFilters === 'string') {
+            ruleFilters = JSON.parse(ruleFilters!.toString());
         }
+
+        const filteredObject: FilterQueries<Partial<DigitalIdentityFilters>> = extractFiltersQuery<DigitalIdentityFilters>(
+            ruleFilters as RuleFilter[],
+            userFilters,
+            digitalIdentityMapFieldType,
+        );
+
+        const response = await ElasticDIRepository.searchByFullName(uniqueId!.toString(), filteredObject);
+        if (!response) {
+            throw new ApiErrors.NotFoundError();
+        }
+        ResponseHandler.success<DigitalIdentityDTO[]>(res, response);
     }
 }
 

@@ -1,7 +1,7 @@
-import { IRole } from '../role/interface';
+import { RoleDTO } from '../role/dto';
 
-export interface IDigitalIdentity {
-    // DI as it saved in the db
+export interface DigitalIdentityDTO {
+    // DI as it should be returned to client
     type: string;
     source: string;
     mail: string;
@@ -11,5 +11,5 @@ export interface IDigitalIdentity {
     updatedAt: Date;
     isRoleAttachable: boolean;
     upn: string;
-    role: IRole;
+    role: RoleDTO;
 }

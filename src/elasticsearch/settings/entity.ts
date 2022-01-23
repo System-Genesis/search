@@ -16,7 +16,7 @@ const settings = {
             path_hierarchy,
         },
         normalizer: {
-            my_normalizer
+            my_normalizer,
         },
         tokenizer: {
             edge_ngram_tokenizer,
@@ -47,7 +47,7 @@ const entityMappings = {
         },
         entityType: {
             type: 'keyword',
-            normalizer: "my_normalizer"
+            normalizer: 'my_normalizer',
         },
         identityCard: {
             type: 'keyword',
@@ -66,7 +66,7 @@ const entityMappings = {
         },
         status: {
             type: 'keyword',
-            normalizer: "my_normalizer"
+            normalizer: 'my_normalizer',
         },
         dischargeDay: {
             type: 'date',
@@ -80,11 +80,11 @@ const entityMappings = {
         },
         rank: {
             type: 'keyword',
-            normalizer: "my_normalizer"
+            normalizer: 'my_normalizer',
         },
         mail: {
             type: 'keyword',
-            normalizer: "my_normalizer"
+            normalizer: 'my_normalizer',
         },
         job: {
             enabled: false,
@@ -137,11 +137,11 @@ const entityMappings = {
                 },
                 source: {
                     type: 'keyword',
-                    normalizer: "my_normalizer"
+                    normalizer: 'my_normalizer',
                 },
                 mail: {
                     type: 'keyword',
-                    normalizer: "my_normalizer"
+                    normalizer: 'my_normalizer',
                 },
                 uniqueId: {
                     type: 'keyword',
@@ -157,6 +157,9 @@ const entityMappings = {
                 },
                 isRoleAttachable: {
                     type: 'boolean',
+                },
+                upn: {
+                    type: 'keyword',
                 },
                 role: {
                     properties: {
