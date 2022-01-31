@@ -311,6 +311,7 @@ export function buildQueryGroup(
     const mustNot: esb.Query[] = [];
     const must: esb.Query[] = [];
     let isExpanded = false;
+    let m = 2;
     if (nameAndHierarchy) {
         should.push(
             esb
@@ -333,10 +334,12 @@ export function buildQueryGroup(
         );
     }
     if (name) {
+        m = 1;
         should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).fuzziness('AUTO').boost(1.2));
         must.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).fuzziness('AUTO').boost(1.2));
     }
     if (hierarchy) {
+        m = 1;
         should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, hierarchy).fuzziness('AUTO').boost(1.2));
     }
     for (const key in filters.userFilters) {
@@ -423,7 +426,7 @@ export function buildQueryGroup(
 
     const queryBody = esb
         .requestBodySearch()
-        .query(esb.boolQuery().should(should).mustNot(mustNot).must(must).filter(filter).minimumShouldMatch(2))
+        .query(esb.boolQuery().should(should).mustNot(mustNot).must(must).filter(filter).minimumShouldMatch(m))
         .source({ excludes: !isExpanded ? excludedFields : [] })
         .toJSON();
     // eslint-disable-next-line no-return-await
