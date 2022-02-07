@@ -5,7 +5,7 @@ import config from '../../config';
 import { ElasticSearchBaseRepository, QueryConfig } from '../../elasticsearch/elasticSearchBaseRepository';
 import { IDigitalIdentity } from './interface';
 import { DigitalIdentityFilters, DigitalIdentityTextSearch } from './textSearchInterface';
-import { FilterQueries } from '../../types';
+import { FilterQueries } from '../../utils/types';
 
 const {
     indexNames: { digitalIdentities: _indexName },

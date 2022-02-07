@@ -11,7 +11,7 @@ import config from '../config';
 import { EntityFilters } from '../express/entity/textSearchInterface';
 import { DigitalIdentityFilters } from '../express/digitalIdentity/textSearchInterface';
 import { RoleFilters } from '../express/role/textSearchInterface';
-import { FilterQueries } from '../types';
+import { FilterQueries } from '../utils/types';
 import { filterMustArr, filterMustNotArr } from '../utils/middlwareHelpers';
 import { GroupQuery, GroupFilters } from '../express/group/textSearchInterface';
 

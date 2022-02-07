@@ -3,7 +3,7 @@ import { Response, Request } from 'express';
 import ElasticGroupRepository from './elasticSearchRepository';
 import { GroupFilters, GroupQuery, groupMapFieldType } from './textSearchInterface';
 import { extractFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
-import { FilterQueries, RuleFilter } from '../../types';
+import { FilterQueries, RuleFilter } from '../../utils/types';
 import { GroupDTO } from './dto';
 import ResponseHandler from '../../utils/responseHandler';
 

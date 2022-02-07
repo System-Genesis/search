@@ -1,4 +1,4 @@
-import { FilterQueries } from '../../types';
+import { FilterQueries } from '../../utils/types';
 import { EntityFilters } from '../entity/textSearchInterface';
 import { IDigitalIdentity } from './interface';
 

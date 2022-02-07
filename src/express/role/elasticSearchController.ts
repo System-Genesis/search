@@ -3,7 +3,7 @@ import { Response, Request } from 'express';
 import ElasticRoleRepository from './elasticSearchRepository';
 import { RoleFilters, roleMapFieldType } from './textSearchInterface';
 import { extractFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
-import { FilterQueries, RuleFilter } from '../../types';
+import { FilterQueries, RuleFilter } from '../../utils/types';
 import { RoleDTO } from './dto';
 import ResponseHandler from '../../utils/responseHandler';
 

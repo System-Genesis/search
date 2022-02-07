@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 import { Response, Request } from 'express';
-import { FilterQueries, RuleFilter } from '../../types';
+import { FilterQueries, RuleFilter } from '../../utils/types';
 import { extractFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
 import ResponseHandler from '../../utils/responseHandler';
 import { DigitalIdentityDTO } from './dto';

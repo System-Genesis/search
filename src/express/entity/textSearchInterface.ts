@@ -1,4 +1,4 @@
-import { FilterQueries } from '../../types';
+import { FilterQueries } from '../../utils/types';
 import { IEntity } from './interface';
 
 export type EntityFilters = {

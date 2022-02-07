@@ -3,7 +3,7 @@ import { Response, Request } from 'express';
 import ElasticEntityRepository from './elasticSearchRepository';
 import { EntityFilters, entityMapFieldType } from './textSearchInterface';
 import { extractFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
-import { FilterQueries, RuleFilter } from '../../types';
+import { FilterQueries, RuleFilter } from '../../utils/types';
 import { IEntity } from './interface';
 import ResponseHandler from '../../utils/responseHandler';
 import { EntityDTO } from './dto';

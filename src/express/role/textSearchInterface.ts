@@ -1,4 +1,4 @@
-import { FilterQueries } from '../../types';
+import { FilterQueries } from '../../utils/types';
 import { IRole } from './interface';
 
 export type RoleFilters = {

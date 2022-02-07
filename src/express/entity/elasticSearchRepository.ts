@@ -7,7 +7,7 @@ import { ElasticSearchBaseRepository, QueryConfig } from '../../elasticsearch/el
 // import { IDigitalIdentity } from '../digitalIdentity/interface';
 import { EntityFilters, EntityTextSearch } from './textSearchInterface';
 import { buildQuery } from '../../elasticsearch/index';
-import { FilterQueries } from '../../types';
+import { FilterQueries } from '../../utils/types';
 import { IEntity } from './interface';
 
 const {
