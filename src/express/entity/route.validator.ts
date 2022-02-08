@@ -1,31 +1,5 @@
 import * as Joi from 'joi';
 
-// const JoiBooleanConvertible: joi.Extension = {
-//     type: 'stringbool',
-//     base: joi.string(),
-
-//     coerce: {
-//         from: 'string',
-//         method(value, _helpers) {
-//             return { value: value.toString() === 'true' };
-//         },
-//     },
-// };
-// joi.extend((joi) : joi.Extension => {
-//     return {
-//       type: 'string',
-//       base: joi.string(),
-//       name: 'booleanConvertible',
-//       coerce:{ from:'string',method(value, helpers) {
-//         function returnBool (n):any {
-//           return n === 'true'
-//         }
-//         return returnBool(value)
-//       }
-//     }
-//     }
-//   })
-
 export const EntitySchema = Joi.object({
     id: Joi.string(),
     displayName: Joi.string(),

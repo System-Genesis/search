@@ -1,5 +1,4 @@
 export interface RoleDTO {
-    // role as it should be returned to client
     roleId: string;
     jobTitle: string;
     digitalIdentityUniqueId: string;

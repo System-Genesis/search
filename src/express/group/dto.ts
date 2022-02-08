@@ -2,7 +2,6 @@ import { EntityDTO } from '../entity/dto';
 import { RoleDTO } from '../role/dto';
 
 export interface GroupDTO {
-    // Group as it should be returned to client
     id: string;
     name: string;
     source: string;

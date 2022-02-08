@@ -16,7 +16,7 @@ export class ElasticRoleRepository extends ElasticSearchBaseRepository<IRole> im
         super(indexName, elasticClient, queryConfig);
     }
 
-    async searchByFullName(roleId: string, filters: FilterQueries<Partial<RoleFilters>>) {
+    async searchByRoleId(roleId: string, filters: FilterQueries<Partial<RoleFilters>>) {
         return await this.search(buildQueryRole(roleId, filters));
     }
 }

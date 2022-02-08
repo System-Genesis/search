@@ -2,12 +2,11 @@ import { DigitalIdentityDTO } from '../digitalIdentity/dto';
 import { ProfilePictureData } from './interface';
 
 export interface EntityDTO {
-    // Entity as it should be returned to client
     id: string;
     displayName: string;
     hierarchy: string;
     directGroup: string;
-    entityType: string; // enum
+    entityType: string;
     identityCard: string;
     personalNumber: string;
     goalUserId?: string;
@@ -17,13 +16,13 @@ export interface EntityDTO {
     fullName: string;
     akaUnit: string;
     dischargeDay: Date;
-    rank: string; // enum
+    rank: string;
     mail: string;
     jobTitle: string;
     phone: string[];
     mobilePhone: string[];
     address: string;
-    clearance: string; // string of number - enum
+    clearance: string;
     sex?: string;
     birthDate?: Date;
     createdAt?: Date;

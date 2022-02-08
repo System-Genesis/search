@@ -21,7 +21,6 @@ export const errorMiddleware = async (error: Error, _req: express.Request, res: 
     } else {
         ResponseHandler.internal(res, error.message);
     }
-    // TODO: add some loggingdsa
 
     next();
 };

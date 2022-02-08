@@ -76,6 +76,7 @@ export function extractFiltersQuery<T>(
     mapRuleFieldType: Map<string, Map<string, string>>,
 ): FilterQueries<Partial<T>> {
     let mustNotFilters: Partial<T> = {};
+
     for (const filterRule of filtersQuery) {
         if (mustNotFilters[mapRuleFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] === undefined) {
             mustNotFilters[mapRuleFieldType!.get(filterRule.field)!.get(filterRule.entityType)!] = [];

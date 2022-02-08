@@ -1,7 +1,6 @@
 import { RoleDTO } from '../role/dto';
 
 export interface DigitalIdentityDTO {
-    // DI as it should be returned to client
     type: string;
     source: string;
     mail: string;

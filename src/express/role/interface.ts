@@ -1,5 +1,4 @@
 export interface IRole {
-    // role as it saved in db
     roleId: string;
     jobTitle: string;
     clearance: string;

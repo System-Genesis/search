@@ -24,6 +24,6 @@ export const groupMapFieldType: Map<string, Map<string, string>> = new Map<strin
 export interface OrganizationGroupTextSearch {
     searchByNameAndHierarchy(
         nameAndHierarchyQuery: Partial<GroupQuery>,
-        filters?: FilterQueries<Partial<GroupFilters>>,
+        filters: FilterQueries<Partial<GroupFilters>>,
     ): Promise<IOrganizationGroup[]>;
 }

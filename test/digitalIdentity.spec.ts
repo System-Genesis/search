@@ -4,9 +4,7 @@
 import * as request from 'supertest';
 import * as qs from 'qs';
 import Server from '../src/express/server';
-//import config from '../src/config/index';
 
-// const { service } = config;
 
 export let server: Server;
 
@@ -15,7 +13,7 @@ beforeAll(async () => {
     console.log('Starting server...');
     try {
         await server.start();
-    } catch (err) {}
+    } catch (err) { }
 
     console.log(`Server started on port: 3005`);
 });

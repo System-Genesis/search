@@ -8,23 +8,20 @@ import { RoleDTO } from './dto';
 import ResponseHandler from '../../utils/responseHandler';
 
 export class ElasticRoleController {
-    static async searchByFullname(req: Request, res: Response) {
-        const reqFilters = req.query;
-        let { roleId, ruleFilters, ...userFilterss } = reqFilters;
+    static async searchByRoleId(req: Request, res: Response) {
+        let { roleId, ruleFilters, ...userFiltersQuery } = req.query;
 
-        const userFilters: Partial<RoleFilters> = transformQueryToUserFilters(userFilterss);
-
-        if (typeof reqFilters.ruleFilters === 'string') {
+        const userFilters: Partial<RoleFilters> = transformQueryToUserFilters(userFiltersQuery);
+        if (typeof ruleFilters === 'string') {
             ruleFilters = JSON.parse(ruleFilters!.toString());
         }
-
         const filteredObject: FilterQueries<Partial<RoleFilters>> = extractFiltersQuery<RoleFilters>(
             ruleFilters as RuleFilter[],
             userFilters,
             roleMapFieldType,
         );
 
-        const response = await ElasticRoleRepository.searchByFullName(roleId!.toString(), filteredObject);
+        const response = await ElasticRoleRepository.searchByRoleId(roleId!.toString(), filteredObject);
         ResponseHandler.success<RoleDTO[]>(res, response);
     }
 }

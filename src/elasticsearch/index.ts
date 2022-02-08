@@ -16,8 +16,6 @@ import { filterMustArr, filterMustNotArr } from '../utils/middlwareHelpers';
 import { GroupQuery, GroupFilters } from '../express/group/textSearchInterface';
 
 export async function initElasticIndexes() {
-    // eslint-disable-next-line no-restricted-syntax
-
     for (const indexSetting of indexes) {
         const { settings = {}, mappings = {}, name } = indexSetting;
         if ((await clientElastic.indices.exists({ index: name })).statusCode === 404) {
@@ -39,7 +37,6 @@ export async function isAlive() {
 }
 export async function deleteElasticData() {
     try {
-        // eslint-disable-next-line no-restricted-syntax
         for (const indexSetting of indexes) {
             await clientElastic.deleteByQuery({
                 index: indexSetting.name,
@@ -62,8 +59,7 @@ export async function readJsonAndWriteElastic(path: string, modelType: string, i
     const files: any = JSON.parse(fs.readFileSync(path, 'utf-8'));
 
     try {
-        // eslint-disable-next-line no-plusplus
-        for (let index = 0; index < files.length; index++) {
+        for (let index = 0; index < files.length; index = +1) {
             if (modelType === config.elasticsearch.indexNames.entities) {
                 files[index].fullName = `${files[index].firstName} ${files[index].lastName}`;
             }
@@ -86,8 +82,8 @@ export async function readJsonAndWriteElastic(path: string, modelType: string, i
  * @param filters Filters, divided to User and Rule filters, User: field queries .asString(),
 /** */
 export function buildQuery(
-    displayName: string,
-    filters?: FilterQueries<Partial<EntityFilters>>,
+    fullName: string,
+    filters: FilterQueries<Partial<EntityFilters>>,
     excludedFields: string[] = [],
     hiddenFields: string[] = [],
 ) {
@@ -95,58 +91,36 @@ export function buildQuery(
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
     const mustNot: esb.Query[] = [];
-    const query = {
-        fullName: displayName,
-    };
     let isExpanded = false;
 
-    for (const [key, val] of Object.entries(query)) {
-        if (!!val && typeof val === 'string') {
-            const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
-            should.push(esb.matchQuery(textField, val).boost(config.elasticsearch.boost));
-            must.push(esb.matchQuery(textField, val).fuzziness(config.elasticsearch.fuzziness));
-        }
-    }
-    for (const key in filters?.userFilters) {
-        if (Object.prototype.hasOwnProperty.call(filters?.userFilters, key)) {
-            if (key === 'expanded') {
-                if (filters!.userFilters[key]?.includes(true)) {
-                    isExpanded = true;
-                }
-            } else {
-                const mustNotArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters!.userFilters[key]) : [];
-                if (mustNotArr.length !== 0) {
-                    const termNotQuery = esb.termsQuery(key, mustNotArr);
-                    mustNot.push(termNotQuery);
-                }
-                const mustArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters!.userFilters[key]) : [];
-                if (mustArr.length !== 0) {
-                    const termQuery = esb.termsQuery(key, mustArr);
-                    filter.push(termQuery);
-                }
+    const textField = `fullName.${config.elasticsearch.fullTextFieldName}`;
+    should.push(esb.matchQuery(textField, fullName).boost(config.elasticsearch.boost));
+    must.push(esb.matchQuery(textField, fullName).fuzziness(config.elasticsearch.fuzziness));
+    for (const key in filters.userFilters) {
+        if (key === 'expanded') {
+            if (filters.userFilters[key]?.includes(true)) {
+                isExpanded = true;
+            }
+        } else {
+            const mustNotArr: string[] = Array.isArray(filters.userFilters[key]) ? filterMustNotArr(filters.userFilters[key]) : [];
+            if (mustNotArr.length !== 0) {
+                const termNotQuery = esb.termsQuery(key, mustNotArr);
+                mustNot.push(termNotQuery);
+            }
+            const mustArr: string[] = Array.isArray(filters.userFilters[key]) ? filterMustArr(filters.userFilters[key]) : [];
+            if (mustArr.length !== 0) {
+                const termQuery = esb.termsQuery(key, mustArr);
+                filter.push(termQuery);
             }
         }
     }
-    for (const key in filters?.ruleFilters) {
-        if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
-            if (key === 'expanded') {
-                if (filters!.ruleFilters[key]?.includes(true)) {
-                    isExpanded = true;
-                }
-            } else {
-                const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
-                if (mustNotArr.length !== 0) {
-                    const termNotQuery = esb.termsQuery(key, mustNotArr);
-                    mustNot.push(termNotQuery);
-                }
-                const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
-                if (mustArr.length !== 0) {
-                    const termQuery = esb.termsQuery(key, mustArr);
-                    mustNot.push(termQuery);
-                }
-            }
+    for (const key in filters.ruleFilters) {
+        if ((filters.ruleFilters[key] as []).length !== 0) {
+            const termQuery = esb.termsQuery(key, filters.ruleFilters[key]);
+            mustNot.push(termQuery);
         }
     }
+
     const requestBody = esb
         .requestBodySearch()
         .query(esb.boolQuery().mustNot(mustNot).must(must).should(should).filter(filter))
@@ -164,62 +138,40 @@ export function buildQuery(
  * @returns The closest digital identitiy that belongs to the uniqueId with the excluded fields, filters and rules specified,
  * if the uniqueId does not have a domain it`s prioritized to the exact uniqueId with different domains.
  */
-export const buildQueryDI = (uniqueId: string, filters?: FilterQueries<Partial<DigitalIdentityFilters>>, excludedFields: string[] = []) => {
+export const buildQueryDI = (uniqueId: string, filters: FilterQueries<Partial<DigitalIdentityFilters>>, excludedFields: string[] = []) => {
     const must: esb.Query[] = [];
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
     const mustNot: esb.Query[] = [];
-    const query = {
-        uniqueId,
-    };
     let isExpanded = false;
 
-    for (const [key, val] of Object.entries(query)) {
-        if (!!val && typeof val === 'string') {
-            must.push(esb.prefixQuery(key, val));
-            should.push(esb.queryStringQuery(`${val}@*`).field(key));
-        }
-    }
-    for (const key in filters?.userFilters) {
-        if (Object.prototype.hasOwnProperty.call(filters?.userFilters, key)) {
-            if (key === 'expanded') {
-                if (filters!.userFilters[key]?.includes(true)) {
-                    isExpanded = true;
-                }
-            } else {
-                const mustNotArr: any[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters!.userFilters[key]) : [];
-                if (mustNotArr.length !== 0) {
-                    const termNotQuery = esb.termsQuery(key, mustNotArr);
-                    mustNot.push(termNotQuery);
-                }
-                const mustArr: any[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters!.userFilters[key]) : [];
-                if (mustArr.length !== 0) {
-                    const termQuery = esb.termsQuery(key, mustArr);
-                    filter.push(termQuery);
-                }
+    must.push(esb.prefixQuery('uniqueId', uniqueId));
+    should.push(esb.queryStringQuery(`${uniqueId}@*`).field('uniqueId'));
+    for (const key in filters.userFilters) {
+        if (key === 'expanded') {
+            if (filters!.userFilters[key]?.includes(true)) {
+                isExpanded = true;
+            }
+        } else {
+            const mustNotArr: any[] = Array.isArray(filters.userFilters[key]) ? filterMustNotArr(filters.userFilters[key]) : [];
+            if (mustNotArr.length !== 0) {
+                const termNotQuery = esb.termsQuery(key, mustNotArr);
+                mustNot.push(termNotQuery);
+            }
+            const mustArr: any[] = Array.isArray(filters.userFilters[key]) ? filterMustArr(filters.userFilters[key]) : [];
+            if (mustArr.length !== 0) {
+                const termQuery = esb.termsQuery(key, mustArr);
+                filter.push(termQuery);
             }
         }
     }
-    for (const key in filters?.ruleFilters) {
-        if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
-            if (key === 'expanded') {
-                if (filters!.userFilters[key]?.includes(true)) {
-                    isExpanded = true;
-                }
-            } else {
-                const mustNotArr: any[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
-                if (mustNotArr.length !== 0) {
-                    const termNotQuery = esb.termsQuery(key, mustNotArr);
-                    mustNot.push(termNotQuery);
-                }
-                const mustArr: any[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
-                if (mustArr.length !== 0) {
-                    const termQuery = esb.termsQuery(key, mustArr);
-                    mustNot.push(termQuery);
-                }
-            }
+    for (const key in filters.ruleFilters) {
+        if ((filters.ruleFilters[key] as []).length !== 0) {
+            const termQuery = esb.termsQuery(key, filters.ruleFilters[key]);
+            mustNot.push(termQuery);
         }
     }
+
     const requestBody = esb
         .requestBodySearch()
         .query(esb.boolQuery().mustNot(mustNot).must(must).should(should).filter(filter).minimumShouldMatch(0))
@@ -236,49 +188,33 @@ export const buildQueryDI = (uniqueId: string, filters?: FilterQueries<Partial<D
  * @returns The closest digital identitiy that belongs to the uniqueId with the filters and rules specified,
  * if the uniqueId does not have a domain it`s prioritized to the exact uniqueId with different domains.
  */
-export function buildQueryRole(roleId: string, filters?: FilterQueries<Partial<RoleFilters>>) {
+export function buildQueryRole(roleId: string, filters: FilterQueries<Partial<RoleFilters>>) {
     const must: esb.Query[] = [];
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
     const mustNot: esb.Query[] = [];
-    const query = {
-        roleId,
-    };
 
-    for (const [key, val] of Object.entries(query)) {
-        if (!!val && typeof val === 'string') {
-            must.push(esb.prefixQuery(key, val));
-            should.push(esb.queryStringQuery(`${val}@*`).field(key));
+    must.push(esb.prefixQuery('roleId', roleId));
+    should.push(esb.queryStringQuery(`${roleId}@*`).field('roleId'));
+    for (const key in filters.userFilters) {
+        const mustNotArr: string[] = Array.isArray(filters.userFilters[key]) ? filterMustNotArr(filters.userFilters[key]) : [];
+        if (mustNotArr.length !== 0) {
+            const termNotQuery = esb.termsQuery(key, mustNotArr);
+            mustNot.push(termNotQuery);
+        }
+        const mustArr: string[] = Array.isArray(filters.userFilters[key]) ? filterMustArr(filters.userFilters[key]) : [];
+        if (mustArr.length !== 0) {
+            const termQuery = esb.termsQuery(key, mustArr);
+            filter.push(termQuery);
         }
     }
-    for (const key in filters?.userFilters) {
-        if (Object.prototype.hasOwnProperty.call(filters?.userFilters, key)) {
-            const mustNotArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters!.userFilters[key]) : [];
-            if (mustNotArr.length !== 0) {
-                const termNotQuery = esb.termsQuery(key, mustNotArr);
-                mustNot.push(termNotQuery);
-            }
-            const mustArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters!.userFilters[key]) : [];
-            if (mustArr.length !== 0) {
-                const termQuery = esb.termsQuery(key, mustArr);
-                filter.push(termQuery);
-            }
+    for (const key in filters.ruleFilters) {
+        if ((filters.ruleFilters[key] as []).length !== 0) {
+            const termQuery = esb.termsQuery(key, filters.ruleFilters[key]);
+            mustNot.push(termQuery);
         }
     }
-    for (const key in filters?.ruleFilters) {
-        if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
-            const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
-            if (mustNotArr.length !== 0) {
-                const termNotQuery = esb.termsQuery(key, mustNotArr);
-                mustNot.push(termNotQuery);
-            }
-            const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
-            if (mustArr.length !== 0) {
-                const termQuery = esb.termsQuery(key, mustArr);
-                mustNot.push(termQuery);
-            }
-        }
-    }
+
     const requestBody = esb
         .requestBodySearch()
         .query(esb.boolQuery().mustNot(mustNot).must(must).should(should).filter(filter).minimumShouldMatch(0))
@@ -309,21 +245,14 @@ export function buildQueryGroup(
     let isExpanded = false;
     let minimumShouldMatch = 2;
     if (nameAndHierarchy) {
+        const hierarchyTextField = `hierarchy.${config.elasticsearch.fullTextFieldName}`;
+        const nameTextFIeld = `name.${config.elasticsearch.fullTextFieldName}`;
         should.push(
-            esb
-                .multiMatchQuery(
-                    [`name.${config.elasticsearch.fullTextFieldName}`, `hierarchy.${config.elasticsearch.fullTextFieldName}`],
-                    nameAndHierarchy,
-                )
-                .type('cross_fields')
-                .boost(config.elasticsearch.boost),
+            esb.multiMatchQuery([nameTextFIeld, hierarchyTextField], nameAndHierarchy).type('cross_fields').boost(config.elasticsearch.boost),
         );
         should.push(
             esb
-                .multiMatchQuery(
-                    [`name.${config.elasticsearch.fullTextFieldName}`, `hierarchy.${config.elasticsearch.fullTextFieldName}`],
-                    nameAndHierarchy,
-                )
+                .multiMatchQuery([nameTextFIeld, hierarchyTextField], nameAndHierarchy)
                 .type('most_fields')
                 .fuzziness(config.elasticsearch.fuzziness)
                 .boost(config.elasticsearch.boost),
@@ -342,36 +271,36 @@ export function buildQueryGroup(
     }
     for (const key in filters.userFilters) {
         if (key === 'expanded') {
-            if (filters!.userFilters[key]?.includes(true)) {
+            if (filters.userFilters[key]?.includes(true)) {
                 isExpanded = true;
             }
         } else if (key === 'status') {
-            if (filters?.userFilters[key] !== undefined && (filters?.userFilters[key] as []).length !== 0) {
-                for (const alive of filters?.userFilters[key] as []) {
+            if ((filters.userFilters[key] as []).length !== 0) {
+                for (const alive of filters.userFilters[key] as []) {
                     const typeAlive: string = (alive as any).toString() === 'true' ? 'active' : 'inactive';
                     filter.push(esb.termQuery('status', typeAlive));
                 }
             }
         } else if (key === 'underGroupId') {
-            if (filters?.userFilters[key] !== undefined && (filters?.userFilters[key] as []).length !== 0) {
-                const mustNotArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters.userFilters[key] as []) : [];
+            if ((filters.userFilters[key] as []).length !== 0) {
+                const mustNotArr: string[] = Array.isArray(filters.userFilters[key]) ? filterMustNotArr(filters.userFilters[key] as []) : [];
                 if (mustNotArr.length !== 0) {
                     const termNotQuery = esb.termsQuery('ancestors', mustNotArr);
                     mustNot.push(termNotQuery);
                 }
-                const mustArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters.userFilters[key] as []) : [];
+                const mustArr: string[] = Array.isArray(filters.userFilters[key]) ? filterMustArr(filters.userFilters[key] as []) : [];
                 if (mustArr.length !== 0) {
                     const termQuery = esb.termsQuery('ancestors', mustArr);
                     filter.push(termQuery);
                 }
             }
         } else {
-            const mustNotArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters!.userFilters[key]) : [];
+            const mustNotArr: string[] = Array.isArray(filters.userFilters[key]) ? filterMustNotArr(filters.userFilters[key]) : [];
             if (mustNotArr.length !== 0) {
                 const termNotQuery = esb.termsQuery(key, mustNotArr);
                 mustNot.push(termNotQuery);
             }
-            const mustArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters!.userFilters[key]) : [];
+            const mustArr: string[] = Array.isArray(filters.userFilters[key]) ? filterMustArr(filters.userFilters[key]) : [];
             if (mustArr.length !== 0) {
                 const termQuery = esb.termsQuery(key, mustArr);
                 filter.push(termQuery);
@@ -379,42 +308,20 @@ export function buildQueryGroup(
         }
     }
 
-    for (const key in filters?.ruleFilters) {
-        if (key === 'expanded') {
-            if (filters!.userFilters[key]?.includes(true)) {
-                isExpanded = true;
-            }
-        } else if (key === 'isAlive') {
-            if (filters?.ruleFilters[key] !== undefined && (filters?.ruleFilters[key] as []).length !== 0) {
-                for (const alive of filters?.ruleFilters[key] as []) {
-                    const typeAlive: string = (alive as any).toString() === 'true' ? 'active' : 'inactive';
-                    mustNot.push(esb.termQuery('status', typeAlive));
-                }
+    for (const key in filters.ruleFilters) {
+        if (key === 'isAlive') {
+            for (const alive of filters.ruleFilters[key] as []) {
+                const typeAlive: string = (alive as any).toString() === 'true' ? 'active' : 'inactive';
+                mustNot.push(esb.termQuery('status', typeAlive));
             }
         } else if (key === 'underGroupId') {
-            if (filters?.ruleFilters[key] !== undefined && (filters?.ruleFilters[key] as []).length !== 0) {
-                const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters.ruleFilters[key] as []) : [];
-                if (mustNotArr.length !== 0) {
-                    const termNotQuery = esb.termsQuery('ancestors', mustNotArr);
-                    mustNot.push(termNotQuery);
-                }
-                const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters.ruleFilters[key] as []) : [];
-                if (mustArr.length !== 0) {
-                    const termQuery = esb.termsQuery('ancestors', mustArr);
-                    mustNot.push(termQuery);
-                }
-            }
-        } else {
-            const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
-            if (mustNotArr.length !== 0) {
-                const termNotQuery = esb.termsQuery(key, mustNotArr);
-                mustNot.push(termNotQuery);
-            }
-            const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
-            if (mustArr.length !== 0) {
-                const termQuery = esb.termsQuery(key, mustArr);
+            if ((filters.ruleFilters[key] as []).length !== 0) {
+                const termQuery = esb.termsQuery('ancestors', filters.ruleFilters[key]);
                 mustNot.push(termQuery);
             }
+        } else if ((filters.ruleFilters[key] as []).length !== 0) {
+            const termQuery = esb.termsQuery(key, filters.ruleFilters[key]);
+            mustNot.push(termQuery);
         }
     }
 
@@ -423,8 +330,13 @@ export function buildQueryGroup(
         .query(esb.boolQuery().should(should).mustNot(mustNot).must(must).filter(filter).minimumShouldMatch(minimumShouldMatch))
         .source({ excludes: !isExpanded ? excludedFields : [] })
         .toJSON();
-    // eslint-disable-next-line no-return-await
     return queryBody;
 }
 
 export default { initElasticIndexes };
+
+// const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
+// if (mustNotArr.length !== 0) {
+//     const termNotQuery = esb.termsQuery(key, mustNotArr);
+//     mustNot.push(termNotQuery);
+// }

@@ -10,11 +10,10 @@ import { EntityDTO } from './dto';
 
 export class ElasticEntityController {
     static async searchByFullname(req: Request, res: Response) {
-        const reqFilters = req.query;
-        let { fullName, ruleFilters, ...userFilterss } = reqFilters;
-        const userFilters: Partial<EntityFilters> = transformQueryToUserFilters(userFilterss);
+        let { fullName, ruleFilters, ...userFiltersQuery } = req.query;
+        const userFilters: Partial<EntityFilters> = transformQueryToUserFilters(userFiltersQuery);
 
-        if (typeof reqFilters.ruleFilters === 'string') {
+        if (typeof ruleFilters === 'string') {
             ruleFilters = JSON.parse(ruleFilters!.toString());
         }
         const filteredObject: FilterQueries<Partial<EntityFilters>> = extractFiltersQuery<EntityFilters>(

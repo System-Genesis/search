@@ -10,20 +10,18 @@ export type ProfilePictureData = {
 
 export type pictures = {
     profile: {
-        // TODO: add url? pictures DTO?
         meta: ProfilePictureData;
     };
 };
 
 interface IEntity {
-    // Entity's saved in denormalized db
     _id: Schema.Types.ObjectId;
     id: string;
     displayName: string;
     hierarchy: string;
     hierarchyIds: string[];
     directGroup: string;
-    entityType: string; // enum
+    entityType: string;
     identityCard: string;
     personalNumber: string;
     goalUserId?: string;
@@ -33,13 +31,13 @@ interface IEntity {
     fullName: string;
     akaUnit: string;
     dischargeDay: Date;
-    rank: string; // enum
+    rank: string;
     mail: string;
     jobTitle: string;
     phone: string[];
     mobilePhone: string[];
     address: string;
-    clearance: string; // string of number - enum
+    clearance: string;
     sex?: string;
     birthDate?: Date;
     createdAt?: Date;

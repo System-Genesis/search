@@ -8,17 +8,16 @@ import { GroupDTO } from './dto';
 import ResponseHandler from '../../utils/responseHandler';
 
 export class ElasticGroupController {
-    static async searchByFullname(req: Request, res: Response) {
-        const reqFilters = req.query;
-        let { name, hierarchy, nameAndHierarchy, ruleFilters, ...userFiltersQuery } = reqFilters;
+    static async searchByNameAndHierarchy(req: Request, res: Response) {
+        let { name, hierarchy, nameAndHierarchy, ruleFilters, ...userFiltersQuery } = req.query;
         const groupQueryObj: Partial<GroupQuery> = {
-            name: req.query.name?.toString(),
-            hierarchy: req.query.hierarchy?.toString(),
+            name: name?.toString(),
+            hierarchy: hierarchy?.toString(),
             nameAndHierarchy: nameAndHierarchy?.toString(),
         };
-        const userFilters: Partial<GroupFilters> = transformQueryToUserFilters(userFiltersQuery);
 
-        if (typeof reqFilters.ruleFilters === 'string') {
+        const userFilters: Partial<GroupFilters> = transformQueryToUserFilters(userFiltersQuery);
+        if (typeof ruleFilters === 'string') {
             ruleFilters = JSON.parse(ruleFilters!.toString());
         }
         const filteredObject: FilterQueries<Partial<GroupFilters>> = extractFiltersQuery<GroupFilters>(

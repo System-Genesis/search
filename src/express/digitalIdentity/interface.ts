@@ -1,7 +1,6 @@
 import { IRole } from '../role/interface';
 
 export interface IDigitalIdentity {
-    // DI as it saved in the db
     type: string;
     source: string;
     mail: string;

@@ -33,7 +33,6 @@ export const tokenizers = {
         min_gram: 2,
         type: 'edge_ngram',
         token_chars: ['letter', 'digit'],
-        // custom_token_chars: '+-_',
     },
     custom_path_hierarchy: {
         type: 'path_hierarchy',
@@ -45,7 +44,6 @@ export const tokenizersDI = {
         max_gram: 35,
         min_gram: 2,
         type: 'edge_ngram',
-        //  token_chars: ['letter', 'digit'],
         custom_token_chars: '+-_@.',
     },
     custom_path_hierarchy: {
