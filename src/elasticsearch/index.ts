@@ -83,11 +83,8 @@ export async function readJsonAndWriteElastic(path: string, modelType: string, i
  * Builds the query bool for the Entity route by match and fuzziness
  * @example ("תומי אפק" , {userFilters: {source: ['es_name']}, ruleFilters: {source: ['city_name']}}, 'digitalIdentities', 'hierarchyIds')
  * @param displayName The displayName you desire.
- * @param filters Filters, divided to User and Rule filters, User: field queries to filter from the client, Rule: field queries to not show to the user
- * @param excludedFields Fields to exclude, inherited from the Elasticsearch class repository
- * @param hiddenFields Fields to hide, inherited from the Elasticsearch class repository
- * @returns The closest name that belongs to the fullName with hidden fields, excluded fields, filters and rules specified.
- */
+ * @param filters Filters, divided to User and Rule filters, User: field queries .asString(),
+/** */
 export function buildQuery(
     displayName: string,
     filters?: FilterQueries<Partial<EntityFilters>>,
@@ -106,9 +103,8 @@ export function buildQuery(
     for (const [key, val] of Object.entries(query)) {
         if (!!val && typeof val === 'string') {
             const textField = `${key}.${config.elasticsearch.fullTextFieldName}`;
-            const exactQuery = esb.matchQuery(textField, val).boost(1.2);
-            should.push(exactQuery);
-            must.push(esb.matchQuery(textField, val).fuzziness('AUTO'));
+            should.push(esb.matchQuery(textField, val).boost(config.elasticsearch.boost));
+            must.push(esb.matchQuery(textField, val).fuzziness(config.elasticsearch.fuzziness));
         }
     }
     for (const key in filters?.userFilters) {
@@ -311,7 +307,7 @@ export function buildQueryGroup(
     const mustNot: esb.Query[] = [];
     const must: esb.Query[] = [];
     let isExpanded = false;
-    let m = 2;
+    let minimumShouldMatch = 2;
     if (nameAndHierarchy) {
         should.push(
             esb
@@ -320,7 +316,7 @@ export function buildQueryGroup(
                     nameAndHierarchy,
                 )
                 .type('cross_fields')
-                .boost(1.2),
+                .boost(config.elasticsearch.boost),
         );
         should.push(
             esb
@@ -329,104 +325,102 @@ export function buildQueryGroup(
                     nameAndHierarchy,
                 )
                 .type('most_fields')
-                .fuzziness('AUTO')
-                .boost(1.2),
+                .fuzziness(config.elasticsearch.fuzziness)
+                .boost(config.elasticsearch.boost),
         );
     }
     if (name) {
-        m = 1;
-        should.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).fuzziness('AUTO').boost(1.2));
-        must.push(esb.matchQuery(`name.${config.elasticsearch.fullTextFieldName}`, name).fuzziness('AUTO').boost(1.2));
+        minimumShouldMatch = 1;
+        const textField = `name.${config.elasticsearch.fullTextFieldName}`;
+        should.push(esb.matchQuery(textField, name).fuzziness(config.elasticsearch.fuzziness).boost(config.elasticsearch.boost));
+        must.push(esb.matchQuery(textField, name).fuzziness(config.elasticsearch.fuzziness).boost(config.elasticsearch.boost));
     }
     if (hierarchy) {
-        m = 1;
-        should.push(esb.matchQuery(`hierarchy.${config.elasticsearch.fullTextFieldName}`, hierarchy).fuzziness('AUTO').boost(1.2));
+        minimumShouldMatch = 1;
+        const textField = `hierarchy.${config.elasticsearch.fullTextFieldName}`;
+        should.push(esb.matchQuery(textField, hierarchy).fuzziness(config.elasticsearch.fuzziness).boost(config.elasticsearch.boost));
     }
     for (const key in filters.userFilters) {
-        if (Object.prototype.hasOwnProperty.call(filters?.userFilters, key)) {
-            if (key === 'expanded') {
-                if (filters!.userFilters[key]?.includes(true)) {
-                    isExpanded = true;
+        if (key === 'expanded') {
+            if (filters!.userFilters[key]?.includes(true)) {
+                isExpanded = true;
+            }
+        } else if (key === 'status') {
+            if (filters?.userFilters[key] !== undefined && (filters?.userFilters[key] as []).length !== 0) {
+                for (const alive of filters?.userFilters[key] as []) {
+                    const typeAlive: string = (alive as any).toString() === 'true' ? 'active' : 'inactive';
+                    filter.push(esb.termQuery('status', typeAlive));
                 }
-            } else if (key === 'status') {
-                if (filters?.userFilters[key] !== undefined && (filters?.userFilters[key] as []).length !== 0) {
-                    for (const alive of filters?.userFilters[key] as []) {
-                        const typeAlive: string = (alive as any).toString() === 'true' ? 'active' : 'inactive';
-                        filter.push(esb.termQuery('status', typeAlive));
-                    }
-                }
-            } else if (key === 'underGroupId') {
-                if (filters?.userFilters[key] !== undefined && (filters?.userFilters[key] as []).length !== 0) {
-                    const mustNotArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters.userFilters[key] as []) : [];
-                    if (mustNotArr.length !== 0) {
-                        const termNotQuery = esb.termsQuery('ancestors', mustNotArr);
-                        mustNot.push(termNotQuery);
-                    }
-                    const mustArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters.userFilters[key] as []) : [];
-                    if (mustArr.length !== 0) {
-                        const termQuery = esb.termsQuery('ancestors', mustArr);
-                        filter.push(termQuery);
-                    }
-                }
-            } else {
-                const mustNotArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters!.userFilters[key]) : [];
+            }
+        } else if (key === 'underGroupId') {
+            if (filters?.userFilters[key] !== undefined && (filters?.userFilters[key] as []).length !== 0) {
+                const mustNotArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters.userFilters[key] as []) : [];
                 if (mustNotArr.length !== 0) {
-                    const termNotQuery = esb.termsQuery(key, mustNotArr);
+                    const termNotQuery = esb.termsQuery('ancestors', mustNotArr);
                     mustNot.push(termNotQuery);
                 }
-                const mustArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters!.userFilters[key]) : [];
+                const mustArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters.userFilters[key] as []) : [];
                 if (mustArr.length !== 0) {
-                    const termQuery = esb.termsQuery(key, mustArr);
+                    const termQuery = esb.termsQuery('ancestors', mustArr);
                     filter.push(termQuery);
                 }
+            }
+        } else {
+            const mustNotArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustNotArr(filters!.userFilters[key]) : [];
+            if (mustNotArr.length !== 0) {
+                const termNotQuery = esb.termsQuery(key, mustNotArr);
+                mustNot.push(termNotQuery);
+            }
+            const mustArr: string[] = Array.isArray(filters?.userFilters[key]) ? filterMustArr(filters!.userFilters[key]) : [];
+            if (mustArr.length !== 0) {
+                const termQuery = esb.termsQuery(key, mustArr);
+                filter.push(termQuery);
             }
         }
     }
 
     for (const key in filters?.ruleFilters) {
-        if (Object.prototype.hasOwnProperty.call(filters?.ruleFilters, key)) {
-            if (key === 'expanded') {
-                if (filters!.userFilters[key]?.includes(true)) {
-                    isExpanded = true;
+        if (key === 'expanded') {
+            if (filters!.userFilters[key]?.includes(true)) {
+                isExpanded = true;
+            }
+        } else if (key === 'isAlive') {
+            if (filters?.ruleFilters[key] !== undefined && (filters?.ruleFilters[key] as []).length !== 0) {
+                for (const alive of filters?.ruleFilters[key] as []) {
+                    const typeAlive: string = (alive as any).toString() === 'true' ? 'active' : 'inactive';
+                    mustNot.push(esb.termQuery('status', typeAlive));
                 }
-            } else if (key === 'isAlive') {
-                if (filters?.ruleFilters[key] !== undefined && (filters?.ruleFilters[key] as []).length !== 0) {
-                    for (const alive of filters?.ruleFilters[key] as []) {
-                        const typeAlive: string = (alive as any).toString() === 'true' ? 'active' : 'inactive';
-                        mustNot.push(esb.termQuery('status', typeAlive));
-                    }
-                }
-            } else if (key === 'underGroupId') {
-                if (filters?.ruleFilters[key] !== undefined && (filters?.ruleFilters[key] as []).length !== 0) {
-                    const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters.ruleFilters[key] as []) : [];
-                    if (mustNotArr.length !== 0) {
-                        const termNotQuery = esb.termsQuery('ancestors', mustNotArr);
-                        mustNot.push(termNotQuery);
-                    }
-                    const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters.ruleFilters[key] as []) : [];
-                    if (mustArr.length !== 0) {
-                        const termQuery = esb.termsQuery('ancestors', mustArr);
-                        mustNot.push(termQuery);
-                    }
-                }
-            } else {
-                const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
+            }
+        } else if (key === 'underGroupId') {
+            if (filters?.ruleFilters[key] !== undefined && (filters?.ruleFilters[key] as []).length !== 0) {
+                const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters.ruleFilters[key] as []) : [];
                 if (mustNotArr.length !== 0) {
-                    const termNotQuery = esb.termsQuery(key, mustNotArr);
+                    const termNotQuery = esb.termsQuery('ancestors', mustNotArr);
                     mustNot.push(termNotQuery);
                 }
-                const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
+                const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters.ruleFilters[key] as []) : [];
                 if (mustArr.length !== 0) {
-                    const termQuery = esb.termsQuery(key, mustArr);
+                    const termQuery = esb.termsQuery('ancestors', mustArr);
                     mustNot.push(termQuery);
                 }
+            }
+        } else {
+            const mustNotArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustNotArr(filters!.ruleFilters[key]) : [];
+            if (mustNotArr.length !== 0) {
+                const termNotQuery = esb.termsQuery(key, mustNotArr);
+                mustNot.push(termNotQuery);
+            }
+            const mustArr: string[] = Array.isArray(filters?.ruleFilters[key]) ? filterMustArr(filters!.ruleFilters[key]) : [];
+            if (mustArr.length !== 0) {
+                const termQuery = esb.termsQuery(key, mustArr);
+                mustNot.push(termQuery);
             }
         }
     }
 
     const queryBody = esb
         .requestBodySearch()
-        .query(esb.boolQuery().should(should).mustNot(mustNot).must(must).filter(filter).minimumShouldMatch(m))
+        .query(esb.boolQuery().should(should).mustNot(mustNot).must(must).filter(filter).minimumShouldMatch(minimumShouldMatch))
         .source({ excludes: !isExpanded ? excludedFields : [] })
         .toJSON();
     // eslint-disable-next-line no-return-await

@@ -21,6 +21,8 @@ const config = {
     },
     elasticsearch: {
         indexInitRetries: 3,
+        fuzziness: env.get('FUZZINESS').default('AUTO').asString(),
+        boost: env.get('BOOST').default(1.2).asInt(),
         nodes: env.get('ELASTICSEARCH_HOSTS').required().asString().split(','),
         auth: {
             username: env.get('ELASTICSEARCH_USERNAME').default('').asString(),
