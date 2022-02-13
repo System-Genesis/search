@@ -1,12 +1,12 @@
 import Server from './express/server';
-import { initializeRabbit } from './rabbit/index';
+// import { initializeRabbit } from './rabbit/index';
 import config from './config';
 import { deleteElasticData, initElasticIndexes, readJsonAndWriteElastic } from './elasticsearch';
 
 const { service } = config;
 
 const main = async () => {
-    await initializeRabbit();
+    // await initializeRabbit();
 
     if (service.isMock) {
         await deleteElasticData();

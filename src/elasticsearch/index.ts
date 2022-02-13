@@ -81,12 +81,12 @@ export async function readJsonAndWriteElastic(path: string, modelType: string, i
  * @param displayName The displayName you desire.
  * @param filters Filters, divided to User and Rule filters, User: field queries .asString(),
 /** */
-export function buildQuery(
+export const buildQuery = (
     fullName: string,
     filters: FilterQueries<Partial<EntityFilters>>,
     excludedFields: string[] = [],
     hiddenFields: string[] = [],
-) {
+): object => {
     const must: esb.Query[] = [];
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
@@ -127,7 +127,7 @@ export function buildQuery(
         .source({ excludes: !isExpanded ? excludedFields.concat(hiddenFields) : hiddenFields })
         .toJSON();
     return requestBody;
-}
+};
 
 /**
  * Builds the query bool for the DI route by prefix and regex search
@@ -138,7 +138,7 @@ export function buildQuery(
  * @returns The closest digital identitiy that belongs to the uniqueId with the excluded fields, filters and rules specified,
  * if the uniqueId does not have a domain it`s prioritized to the exact uniqueId with different domains.
  */
-export const buildQueryDI = (uniqueId: string, filters: FilterQueries<Partial<DigitalIdentityFilters>>, excludedFields: string[] = []) => {
+export const buildQueryDI = (uniqueId: string, filters: FilterQueries<Partial<DigitalIdentityFilters>>, excludedFields: string[]): object => {
     const must: esb.Query[] = [];
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
@@ -188,7 +188,7 @@ export const buildQueryDI = (uniqueId: string, filters: FilterQueries<Partial<Di
  * @returns The closest digital identitiy that belongs to the uniqueId with the filters and rules specified,
  * if the uniqueId does not have a domain it`s prioritized to the exact uniqueId with different domains.
  */
-export function buildQueryRole(roleId: string, filters: FilterQueries<Partial<RoleFilters>>) {
+export const buildQueryRole = (roleId: string, filters: FilterQueries<Partial<RoleFilters>>): object => {
     const must: esb.Query[] = [];
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
@@ -220,7 +220,7 @@ export function buildQueryRole(roleId: string, filters: FilterQueries<Partial<Ro
         .query(esb.boolQuery().mustNot(mustNot).must(must).should(should).filter(filter).minimumShouldMatch(0))
         .toJSON();
     return requestBody;
-}
+};
 
 /**
  * Builds the query bool for the Group route by multi match queries from each fields and both fields as one big field
@@ -232,11 +232,11 @@ export function buildQueryRole(roleId: string, filters: FilterQueries<Partial<Ro
  * Mostly used by nameAndHierarchy query search. so the search is prioritzing the field that has best accuracy between hierarchy and name and
  * Also, the best score from both fields together.
  */
-export function buildQueryGroup(
+export const buildQueryGroup = (
     query: Partial<GroupQuery>,
     filters: FilterQueries<Partial<GroupFilters>> = { userFilters: {}, ruleFilters: {} },
-    excludedFields: string[] = [],
-) {
+    excludedFields: string[],
+): object => {
     const { hierarchy, name, nameAndHierarchy } = query;
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
@@ -274,10 +274,10 @@ export function buildQueryGroup(
             if (filters.userFilters[key]?.includes(true)) {
                 isExpanded = true;
             }
-        } else if (key === 'status') {
+        } else if (key === 'isAlive') {
             if ((filters.userFilters[key] as []).length !== 0) {
-                for (const alive of filters.userFilters[key] as []) {
-                    const typeAlive: string = (alive as any).toString() === 'true' ? 'active' : 'inactive';
+                for (const alive of filters.userFilters[key] as boolean[]) {
+                    const typeAlive: string = alive.toString() === 'true' ? 'active' : 'inactive';
                     filter.push(esb.termQuery('status', typeAlive));
                 }
             }
@@ -310,8 +310,8 @@ export function buildQueryGroup(
 
     for (const key in filters.ruleFilters) {
         if (key === 'isAlive') {
-            for (const alive of filters.ruleFilters[key] as []) {
-                const typeAlive: string = (alive as any).toString() === 'true' ? 'active' : 'inactive';
+            for (const alive of filters.ruleFilters[key] as boolean[]) {
+                const typeAlive: string = alive.toString() === 'true' ? 'active' : 'inactive';
                 mustNot.push(esb.termQuery('status', typeAlive));
             }
         } else if (key === 'underGroupId') {
@@ -331,7 +331,7 @@ export function buildQueryGroup(
         .source({ excludes: !isExpanded ? excludedFields : [] })
         .toJSON();
     return queryBody;
-}
+};
 
 export default { initElasticIndexes };
 

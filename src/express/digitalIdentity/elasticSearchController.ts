@@ -11,7 +11,7 @@ export class ElasticDIController {
     static async searchByUniqueId(req: Request, res: Response) {
         let { uniqueId, ruleFilters, ...userFiltersQuery } = req.query;
 
-        const userFilters: Partial<DigitalIdentityFilters> = transformQueryToUserFilters(userFiltersQuery);
+        const userFilters: Partial<DigitalIdentityFilters> = transformQueryToUserFilters<DigitalIdentityFilters>(userFiltersQuery);
         if (typeof ruleFilters === 'string') {
             ruleFilters = JSON.parse(ruleFilters!.toString());
         }

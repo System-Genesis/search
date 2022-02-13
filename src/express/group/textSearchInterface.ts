@@ -9,7 +9,8 @@ export type GroupQuery = {
 
 export type GroupFilters = {
     underGroupId: string[];
-    status: [];
+    isAlive: boolean[];
+    status: string[];
     expanded: boolean[];
     source: string[];
 };

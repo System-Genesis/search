@@ -11,7 +11,7 @@ import { EntityDTO } from './dto';
 export class ElasticEntityController {
     static async searchByFullname(req: Request, res: Response) {
         let { fullName, ruleFilters, ...userFiltersQuery } = req.query;
-        const userFilters: Partial<EntityFilters> = transformQueryToUserFilters(userFiltersQuery);
+        const userFilters: Partial<EntityFilters> = transformQueryToUserFilters<EntityFilters>(userFiltersQuery);
 
         if (typeof ruleFilters === 'string') {
             ruleFilters = JSON.parse(ruleFilters!.toString());

@@ -38,9 +38,9 @@ export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
         }
         if (key === 'expanded') {
             if (Array.isArray(query[key])) {
-                userFilters[key] = (query[key] as []).map((element) => (element as string).toString() === 'true') as never;
+                userFilters[key] = (query[key] as []).map((element) => (element as string).toString() === 'true') as [boolean];
             } else {
-                userFilters[key] = [(query[key] as string).toString() === 'true'] as never;
+                userFilters[key] = [(query[key] as string).toString() === 'true'] as [boolean];
             }
         } else if (key === 'digitalIdentity.source' || key === 'source') {
             if (!Array.isArray(query[key])) {

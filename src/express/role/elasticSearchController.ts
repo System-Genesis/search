@@ -10,8 +10,7 @@ import ResponseHandler from '../../utils/responseHandler';
 export class ElasticRoleController {
     static async searchByRoleId(req: Request, res: Response) {
         let { roleId, ruleFilters, ...userFiltersQuery } = req.query;
-
-        const userFilters: Partial<RoleFilters> = transformQueryToUserFilters(userFiltersQuery);
+        const userFilters: Partial<RoleFilters> = transformQueryToUserFilters<RoleFilters>(userFiltersQuery);
         if (typeof ruleFilters === 'string') {
             ruleFilters = JSON.parse(ruleFilters!.toString());
         }

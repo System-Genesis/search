@@ -16,7 +16,7 @@ export class ElasticGroupController {
             nameAndHierarchy: nameAndHierarchy?.toString(),
         };
 
-        const userFilters: Partial<GroupFilters> = transformQueryToUserFilters(userFiltersQuery);
+        const userFilters: Partial<GroupFilters> = transformQueryToUserFilters<GroupFilters>(userFiltersQuery);
         if (typeof ruleFilters === 'string') {
             ruleFilters = JSON.parse(ruleFilters!.toString());
         }
