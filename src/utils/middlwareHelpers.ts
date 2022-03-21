@@ -46,6 +46,7 @@ export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
             if (!Array.isArray(query[key])) {
                 query[key] = [query[key]];
             }
+            // TODO (RN): fix sources seperation dis and entities (supposed to be the same)
             let aliasSource = key === 'source' ? config.aliases.di : config.aliases.entity;
             let allSources: string[] = [];
             for (const element of query[key]) {
@@ -63,6 +64,7 @@ export function transformQueryToUserFilters<T>(query: any = {}): Partial<T> {
     return userFilters;
 }
 
+// TODO (RN) - consider moving this function to a shared folder and the mapRuleFieldType is defined in the repository layer
 /**
  * @example {filtersQuery: {hierarchy: 'מדור שכיבת סמיכה/צוות בראשית'}, userQuery: 'expanded':true, ,mapRuleFieldType: exported from textSearchInterface dir}
  * @param filtersQuery  The rule filters from gate, to not show the filter the results you must`nt show the client.

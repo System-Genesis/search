@@ -1,6 +1,7 @@
 import { FilterQueries } from '../../utils/types';
 import { IEntity } from './interface';
 
+// TODO (RN) - why filename is textSearchInterface? seems like types file used in controller/service
 export type EntityFilters = {
     status: string[];
     entityType: string[];
@@ -12,8 +13,10 @@ export type EntityFilters = {
     hierarchyPath: string[];
     expanded: boolean[];
     underGroupId: string[];
+    // TODO: add hierarchy
 };
 
+// TODO (RN) - should be in repository
 export const entityMapFieldType: Map<string, Map<string, string>> = new Map<string, Map<string, string>>([
     ['source', new Map<string, string>([['digitalIdentity', 'digitalIdentities.source']])],
     [

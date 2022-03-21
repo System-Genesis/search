@@ -13,6 +13,7 @@ export class ElasticEntityController {
         let { fullName, ruleFilters, ...userFiltersQuery } = req.query;
         const userFilters: Partial<EntityFilters> = transformQueryToUserFilters<EntityFilters>(userFiltersQuery);
 
+        // TODO (RN) - Is it relevant now? leftover from querystring?
         if (typeof ruleFilters === 'string') {
             ruleFilters = JSON.parse(ruleFilters!.toString());
         }
@@ -25,6 +26,7 @@ export class ElasticEntityController {
         ResponseHandler.success<EntityDTO[]>(res, response);
     }
 
+    // TODO (RN) - Should be here? maybe insert to repo directly, following function doesnt take req arg
     static async getEntityById(entityId: string): Promise<IEntity> {
         const entity = await ElasticEntityRepository.findById(entityId);
         if (!entity) {

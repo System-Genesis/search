@@ -29,6 +29,8 @@ export const EntitySchema = Joi.object({
     directGroup: Joi.object(),
     managedGroup: Joi.object(),
 });
+
+// TODO (RN) - used anywhere?
 export const EntityFilters = Joi.object({
     status: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
     entityType: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
@@ -57,6 +59,7 @@ export const getSearchRequestSchema = Joi.object({
     },
 });
 
+// not used other than debug scenario?
 export const getPostRequestSchema = Joi.object({
     body: Joi.alternatives().try(Joi.array().items(EntitySchema), EntitySchema),
 });

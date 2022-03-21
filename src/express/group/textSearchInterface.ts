@@ -22,6 +22,7 @@ export const groupMapFieldType: Map<string, Map<string, string>> = new Map<strin
     ['source', new Map<string, string>([['group', 'source']])],
 ]);
 
+// TODO (RN) - perhaps extract the following interface to a repo interface that doesn't depend on elastic
 export interface OrganizationGroupTextSearch {
     searchByNameAndHierarchy(
         nameAndHierarchyQuery: Partial<GroupQuery>,

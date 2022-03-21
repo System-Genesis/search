@@ -97,6 +97,7 @@ export const buildQuery = (
     should.push(esb.matchQuery(textField, fullName).boost(config.elasticsearch.boost));
     must.push(esb.matchQuery(textField, fullName).fuzziness(config.elasticsearch.fuzziness));
     for (const key in filters.userFilters) {
+        // TODO (RN) - Repeating Code
         if (key === 'expanded') {
             if (filters.userFilters[key]?.includes(true)) {
                 isExpanded = true;

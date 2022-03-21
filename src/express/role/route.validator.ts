@@ -1,5 +1,6 @@
 import * as Joi from 'joi';
 
+// TODO (RN) -  validate values (not necessarily in joi) - Example: Rank in ranks enum
 export const getSearchRequestSchema = Joi.object({
     query: {
         roleId: Joi.string().required().min(2),

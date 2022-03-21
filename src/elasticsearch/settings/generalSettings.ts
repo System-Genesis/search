@@ -49,6 +49,7 @@ export const tokenizersDI = {
         type: 'edge_ngram',
         custom_token_chars: '+-_@.',
     },
+    // TODO: remove following
     custom_path_hierarchy: {
         type: 'path_hierarchy',
         delimeter: '/',

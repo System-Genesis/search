@@ -35,6 +35,7 @@ const mappingsOG = {
                 [fullTextFieldName]: prefix_autocomplete_field_settings,
             },
         },
+        // TODO: remove fields
         akaUnit: {
             type: 'keyword',
             fields: {

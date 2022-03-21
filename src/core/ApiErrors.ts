@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import BaseError from './BaseError';
 
+// TODO (RN) - is it used at all?
 export class ServiceError extends BaseError {
     public code: number;
 

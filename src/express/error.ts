@@ -17,6 +17,7 @@ export const errorMiddleware = async (error: Error, _req: express.Request, res: 
     // await sendToLogger(error.name, error.message);
     if (error instanceof BadRequestError) {
         ResponseHandler.clientError(res, error.message);
+        // TODO (RN) - not found isn't used anywhere
     } else if (error instanceof NotFoundError) {
         ResponseHandler.notFound(res, error.message);
     } else {
