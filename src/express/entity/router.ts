@@ -6,13 +6,8 @@ import { getSearchRequestSchema, getPostRequestSchema, validateOneExistence } fr
 import ValidateRequest from '../../utils/joi';
 
 const entityRouter: Router = Router();
-
-entityRouter.get(
-    '/search',
-    ValidateRequest(getSearchRequestSchema),
-    ValidateRequest(validateOneExistence),
-    wrapController(ElasticEntityController.searchByFullname),
-);
+// TODO (RN) - Fullname => FullName
+entityRouter.get('/search', ValidateRequest(getSearchRequestSchema), wrapController(ElasticEntityController.searchByFullname));
 entityRouter.post('/entity', ValidateRequest(getPostRequestSchema), wrapController(ElasticEntityController.postEntityElastic));
 
 export default entityRouter;

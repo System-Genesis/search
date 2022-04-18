@@ -52,7 +52,6 @@ const { defaultResultLimit } = config.elasticsearch;
 const defaultQueryConfig: QueryConfig = {
     resultSize: defaultResultLimit,
 };
-// k.
 export abstract class ElasticSearchBaseRepository<T> {
     protected _client: Client;
 
@@ -92,6 +91,7 @@ export abstract class ElasticSearchBaseRepository<T> {
             body: query,
             index: this._indexName,
         });
+        // TODO (RN): consider error handling instead of empty array (?)
         if (res.statusCode === 200) {
             return res.body.hits.hits.map((hit) => hit._source);
         }

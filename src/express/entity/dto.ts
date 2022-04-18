@@ -1,25 +1,10 @@
-import { Schema } from 'mongoose';
-import { IDigitalIdentity } from '../digitalIdentity/interface';
+import { DigitalIdentityDTO } from '../digitalIdentity/dto';
+import { ProfilePictureData } from './interface';
 
-export type ProfilePictureData = {
-    path: string;
-    format: string;
-    updatedAt?: Date;
-    createdAt?: Date;
-};
-
-export type pictures = {
-    profile: {
-        meta: ProfilePictureData;
-    };
-};
-
-interface IEntity {
-    _id: Schema.Types.ObjectId;
+export interface EntityDTO {
     id: string;
     displayName: string;
     hierarchy: string;
-    hierarchyIds: string[];
     directGroup: string;
     entityType: string;
     identityCard: string;
@@ -48,7 +33,5 @@ interface IEntity {
             meta: ProfilePictureData;
         };
     };
-    digitalIdentities: [IDigitalIdentity];
+    digitalIdentities: DigitalIdentityDTO;
 }
-
-export { IEntity };

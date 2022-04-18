@@ -33,6 +33,7 @@ const entityMappings = {
         goalUserId: {
             type: 'keyword',
         },
+        // TODO: delete fields
         displayName: {
             type: 'keyword',
             fields: {
@@ -74,6 +75,7 @@ const entityMappings = {
         hierarchy: {
             type: 'keyword',
         },
+        // TODO: delete it
         hierarchyPath: {
             type: 'text',
             analyzer: 'path_hierarchy',
@@ -160,6 +162,9 @@ const entityMappings = {
                 },
                 isRoleAttachable: {
                     type: 'boolean',
+                },
+                upn: {
+                    type: 'keyword',
                 },
                 role: {
                     properties: {

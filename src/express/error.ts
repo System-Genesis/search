@@ -1,4 +1,7 @@
 import * as express from 'express';
+import { BadRequestError, NotFoundError } from '../core/ApiErrors';
+// import { sendToLogger } from '../rabbit';
+import ResponseHandler from '../utils/responseHandler';
 
 export class ServiceError extends Error {
     public code;
@@ -9,25 +12,17 @@ export class ServiceError extends Error {
     }
 }
 
-export const errorMiddleware = (error: Error, _req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (error.name === 'ValidationError') {
-        res.status(400).send({
-            type: error.name,
-            message: error.message,
-        });
-    } else if (error instanceof ServiceError) {
-        res.status(error.code).send({
-            type: error.name,
-            message: error.message,
-        });
+export const errorMiddleware = async (error: Error, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+    // TODO: remove notes
+    // await sendToLogger(error.name, error.message);
+    if (error instanceof BadRequestError) {
+        ResponseHandler.clientError(res, error.message);
+        // TODO (RN) - not found isn't used anywhere
+    } else if (error instanceof NotFoundError) {
+        ResponseHandler.notFound(res, error.message);
     } else {
-        res.status(500).send({
-            type: error.name,
-            message: error.message,
-        });
+        ResponseHandler.internal(res, error.message);
     }
-
-    // TODO: add some loggingdsa
 
     next();
 };

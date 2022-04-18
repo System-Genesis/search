@@ -3,7 +3,7 @@ import { Client } from '@elastic/elasticsearch';
 import config from '../../config';
 import { buildQueryRole } from '../../elasticsearch';
 import { ElasticSearchBaseRepository, QueryConfig } from '../../elasticsearch/elasticSearchBaseRepository';
-import { FilterQueries } from '../../types';
+import { FilterQueries } from '../../utils/types';
 import { IRole } from './interface';
 import { RoleFilters, RoleTextSearch } from './textSearchInterface';
 
@@ -16,7 +16,7 @@ export class ElasticRoleRepository extends ElasticSearchBaseRepository<IRole> im
         super(indexName, elasticClient, queryConfig);
     }
 
-    async searchByFullName(roleId: string, filters: FilterQueries<Partial<RoleFilters>>) {
+    async searchByRoleId(roleId: string, filters: FilterQueries<Partial<RoleFilters>>) {
         return await this.search(buildQueryRole(roleId, filters));
     }
 }

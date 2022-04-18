@@ -3,32 +3,25 @@ import { Response, Request } from 'express';
 import ElasticRoleRepository from './elasticSearchRepository';
 import { RoleFilters, roleMapFieldType } from './textSearchInterface';
 import { extractFiltersQuery, transformQueryToUserFilters } from '../../utils/middlwareHelpers';
-import { FilterQueries, RuleFilter } from '../../types';
-import { sendToLogger } from '../../rabbit';
+import { FilterQueries, RuleFilter } from '../../utils/types';
+import { RoleDTO } from './dto';
+import ResponseHandler from '../../utils/responseHandler';
 
 export class ElasticRoleController {
-    static async searchByFullname(req: Request, res: Response) {
-        const reqFilters = req.query;
-        let { roleId, ruleFilters, ...userFilterss } = reqFilters;
-
-        const userFilters: Partial<RoleFilters> = transformQueryToUserFilters(userFilterss);
-        try {
-            if (typeof reqFilters.ruleFilters === 'string') {
-                ruleFilters = JSON.parse(ruleFilters!.toString());
-            }
-
-            const filteredObject: FilterQueries<Partial<RoleFilters>> = extractFiltersQuery<RoleFilters>(
-                ruleFilters as RuleFilter[],
-                userFilters,
-                roleMapFieldType,
-            );
-
-            const response = await ElasticRoleRepository.searchByFullName(roleId!.toString(), filteredObject);
-            res.json(response);
-        } catch (err) {
-            await sendToLogger('error', (err as any).message);
-            res.json((err as any).message);
+    static async searchByRoleId(req: Request, res: Response) {
+        let { roleId, ruleFilters, ...userFiltersQuery } = req.query;
+        const userFilters: Partial<RoleFilters> = transformQueryToUserFilters<RoleFilters>(userFiltersQuery);
+        if (typeof ruleFilters === 'string') {
+            ruleFilters = JSON.parse(ruleFilters!.toString());
         }
+        const filteredObject: FilterQueries<Partial<RoleFilters>> = extractFiltersQuery<RoleFilters>(
+            ruleFilters as RuleFilter[],
+            userFilters,
+            roleMapFieldType,
+        );
+
+        const response = await ElasticRoleRepository.searchByRoleId(roleId!.toString(), filteredObject);
+        ResponseHandler.success<RoleDTO[]>(res, response);
     }
 }
 

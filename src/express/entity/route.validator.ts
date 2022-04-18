@@ -1,31 +1,5 @@
 import * as Joi from 'joi';
 
-// const JoiBooleanConvertible: joi.Extension = {
-//     type: 'stringbool',
-//     base: joi.string(),
-
-//     coerce: {
-//         from: 'string',
-//         method(value, _helpers) {
-//             return { value: value.toString() === 'true' };
-//         },
-//     },
-// };
-// joi.extend((joi) : joi.Extension => {
-//     return {
-//       type: 'string',
-//       base: joi.string(),
-//       name: 'booleanConvertible',
-//       coerce:{ from:'string',method(value, helpers) {
-//         function returnBool (n):any {
-//           return n === 'true'
-//         }
-//         return returnBool(value)
-//       }
-//     }
-//     }
-//   })
-
 export const EntitySchema = Joi.object({
     id: Joi.string(),
     displayName: Joi.string(),
@@ -55,6 +29,8 @@ export const EntitySchema = Joi.object({
     directGroup: Joi.object(),
     managedGroup: Joi.object(),
 });
+
+// TODO (RN) - used anywhere?
 export const EntityFilters = Joi.object({
     status: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
     entityType: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
@@ -95,6 +71,7 @@ export const getSearchRequestSchema = Joi.object({
     },
 }).or('query.fullName', 'query.uniqueId');
 
+// not used other than debug scenario?
 export const getPostRequestSchema = Joi.object({
     body: Joi.alternatives().try(Joi.array().items(EntitySchema), EntitySchema),
 });

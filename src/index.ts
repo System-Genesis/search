@@ -1,9 +1,8 @@
-/* eslint-disable no-console */
-// import * as apm from 'elastic-apm-node';
 import Server from './express/server';
-import { initializeRabbit } from './rabbit/index';
+// import { initializeRabbit } from './rabbit/index';
 import config from './config';
-import { deleteElasticData, initElasticIndexes, readJsonAndWriteElastic } from './elasticsearch'; //
+import { deleteElasticData, initElasticIndexes, readJsonAndWriteElastic } from './elasticsearch';
+import { initializeRabbit } from './rabbit';
 
 const { service } = config;
 

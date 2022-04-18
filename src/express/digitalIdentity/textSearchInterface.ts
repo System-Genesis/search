@@ -1,11 +1,11 @@
-import { FilterQueries } from '../../types';
+import { FilterQueries } from '../../utils/types';
 import { EntityFilters } from '../entity/textSearchInterface';
 import { IDigitalIdentity } from './interface';
 
 export type DigitalIdentityFilters = Partial<{
     type: string[];
     source: string[];
-    isRoleAttachable: boolean[]; // important
+    isRoleAttachable: boolean[];
     mail: string[];
     jobTitle: string[];
     entityId: string[];
@@ -23,5 +23,5 @@ export const digitalIdentityMapFieldType: Map<string, Map<string, string>> = new
 ]);
 
 export interface DigitalIdentityTextSearch {
-    searchByFullName(uniqueId: string, filters?: FilterQueries<Partial<EntityFilters>>): Promise<IDigitalIdentity[]>;
+    searchByUniqueId(uniqueId: string, filters: FilterQueries<Partial<EntityFilters>>): Promise<IDigitalIdentity[]>;
 }

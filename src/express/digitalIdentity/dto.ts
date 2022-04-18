@@ -1,6 +1,6 @@
-import { IRole } from '../role/interface';
+import { RoleDTO } from '../role/dto';
 
-export interface IDigitalIdentity {
+export interface DigitalIdentityDTO {
     type: string;
     source: string;
     mail: string;
@@ -10,5 +10,5 @@ export interface IDigitalIdentity {
     updatedAt: Date;
     isRoleAttachable: boolean;
     upn: string;
-    role: IRole;
+    role: RoleDTO;
 }

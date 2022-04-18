@@ -1,9 +1,9 @@
-export interface IRole {
+export interface RoleDTO {
     roleId: string;
     jobTitle: string;
-    clearance: string;
     digitalIdentityUniqueId: string;
     directGroup: string;
+    clearance: string;
     hierarchy: string;
     hierarchyIds: string[];
     createdAt: Date;
