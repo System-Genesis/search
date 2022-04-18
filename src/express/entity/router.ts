@@ -6,7 +6,7 @@ import { getSearchRequestSchema, getPostRequestSchema, validateOneExistence } fr
 import ValidateRequest from '../../utils/joi';
 
 const entityRouter: Router = Router();
-
+// TODO (RN) - Fullname => FullName
 entityRouter.get(
     '/search',
     ValidateRequest(getSearchRequestSchema),
