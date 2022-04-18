@@ -1,5 +1,5 @@
 import Server from './express/server';
-// import { initializeRabbit } from './rabbit/index';
+import { initializeRabbit } from './rabbit/index';
 import config from './config';
 import { deleteElasticData, initElasticIndexes, readJsonAndWriteElastic } from './elasticsearch';
 
