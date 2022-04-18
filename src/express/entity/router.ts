@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import ElasticEntityController from './elasticSearchController';
 import { wrapController } from '../../utils/express';
-import { getSearchRequestSchema, getPostRequestSchema, validateOneExistence } from './route.validator';
+import { getSearchRequestSchema, getPostRequestSchema } from './route.validator';
 
 import ValidateRequest from '../../utils/joi';
 
