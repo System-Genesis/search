@@ -147,6 +147,9 @@ const entityMappings = {
                 },
                 uniqueId: {
                     type: 'keyword',
+                    fields: {
+                        [fullTextFieldName]: prefix_autocomplete_field_settings,
+                    },
                 },
                 entityId: {
                     type: 'keyword',

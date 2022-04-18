@@ -10,8 +10,9 @@ import { EntityDTO } from './dto';
 
 export class ElasticEntityController {
     static async searchByFullname(req: Request, res: Response) {
-        let { fullName, ruleFilters, ...userFiltersQuery } = req.query;
-        const userFilters: Partial<EntityFilters> = transformQueryToUserFilters<EntityFilters>(userFiltersQuery);
+        const reqFilters = req.query;
+        let { fullName, uniqueId, ruleFilters, ...userFilterss } = reqFilters;
+        const userFilters: Partial<EntityFilters> = transformQueryToUserFilters(userFilterss);
 
         // TODO (RN) - Is it relevant now? leftover from querystring?
         if (typeof ruleFilters === 'string') {

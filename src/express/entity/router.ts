@@ -1,13 +1,18 @@
 import { Router } from 'express';
 import ElasticEntityController from './elasticSearchController';
 import { wrapController } from '../../utils/express';
-import { getSearchRequestSchema, getPostRequestSchema } from './route.validator';
+import { getSearchRequestSchema, getPostRequestSchema, validateOneExistence } from './route.validator';
 
 import ValidateRequest from '../../utils/joi';
 
 const entityRouter: Router = Router();
-// TODO (RN) - Fullname => FullName
-entityRouter.get('/search', ValidateRequest(getSearchRequestSchema), wrapController(ElasticEntityController.searchByFullname));
+
+entityRouter.get(
+    '/search',
+    ValidateRequest(getSearchRequestSchema),
+    ValidateRequest(validateOneExistence),
+    wrapController(ElasticEntityController.searchByFullname),
+);
 entityRouter.post('/entity', ValidateRequest(getPostRequestSchema), wrapController(ElasticEntityController.postEntityElastic));
 
 export default entityRouter;
