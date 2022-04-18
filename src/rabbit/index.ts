@@ -15,7 +15,9 @@ export const initializeRabbit = async () => {
 };
 
 export const sendToLogger = async (level: string, message: string, extraFields?: any) => {
-    await menash.send(rabbit.loggerQueueName, { level, message, system: 'kartoffel', service: 'search', extraFields });
+    if (config.service.isMock) {
+        await menash.send(rabbit.loggerQueueName, { level, message, system: 'kartoffel', service: 'search', extraFields });
+    }
 };
 
 export default { initializeRabbit, sendToLogger };

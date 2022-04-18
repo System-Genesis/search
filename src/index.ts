@@ -6,9 +6,9 @@ import { deleteElasticData, initElasticIndexes, readJsonAndWriteElastic } from '
 const { service } = config;
 
 const main = async () => {
-    // await initializeRabbit();
-
     if (service.isMock) {
+        await initializeRabbit();
+
         await deleteElasticData();
         await initElasticIndexes();
         await readJsonAndWriteElastic(`${process.cwd()}/roles2.json`, config.elasticsearch.indexNames.roles, 'roleId');
