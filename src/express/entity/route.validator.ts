@@ -50,6 +50,17 @@ export const validateOneExistence = Joi.object({
             then: Joi.forbidden(),
             otherwise: Joi.string().min(2).required(),
         }),
+        ruleFilters: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
+        status: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
+        entityType: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
+        'digitalIdentity.source': Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
+        'digitalIdentities.mail': Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
+        mail: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
+        rank: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
+        responsibility: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
+        hierarchyPath: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
+        expanded: Joi.alternatives().try(Joi.array(), Joi.string(), Joi.boolean()).allow(Joi.array().length(0)),
+        underGroupId: Joi.alternatives().try(Joi.array(), Joi.bool()).allow(Joi.array().length(0)),
     },
 });
 
