@@ -15,8 +15,14 @@ const config = {
         port: env.get('PORT').required().asPortNumber(),
         isMock: env.get('IS_MOCK').default('false').asString().toLowerCase() === 'true',
     },
+    aliases: {
+        di: env.get('ALIASES_DI').required().asJson(),
+        entity: env.get('ALIASES_ENTITY').required().asJson(),
+    },
     elasticsearch: {
         indexInitRetries: 3,
+        fuzziness: env.get('FUZZINESS').default('AUTO').asString(),
+        boost: env.get('BOOST').default(1.2).asFloat(),
         nodes: env.get('ELASTICSEARCH_HOSTS').required().asString().split(','),
         auth: {
             username: env.get('ELASTICSEARCH_USERNAME').default('').asString(),

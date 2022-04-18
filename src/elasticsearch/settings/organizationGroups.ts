@@ -2,10 +2,10 @@
 import config from '../../config/index';
 import { IndexSettings } from './indexSettings';
 
-import { analyzers, tokenizers, prefix_autocomplete_field_settings } from './generalSettings';
+import { analyzers, tokenizers, prefix_autocomplete_field_settings, normalizers } from './generalSettings';
 
 const { fullTextFieldName } = config.elasticsearch;
-
+const { my_normalizer } = normalizers;
 const { autocomplete, autocomplete_search } = analyzers;
 const { edge_ngram_tokenizer } = tokenizers;
 
@@ -14,6 +14,9 @@ const settings = {
         analyzer: {
             autocomplete,
             autocomplete_search,
+        },
+        normalizer: {
+            my_normalizer,
         },
         tokenizer: {
             edge_ngram_tokenizer,
@@ -32,6 +35,7 @@ const mappingsOG = {
                 [fullTextFieldName]: prefix_autocomplete_field_settings,
             },
         },
+        // TODO: remove fields
         akaUnit: {
             type: 'keyword',
             fields: {
@@ -47,6 +51,10 @@ const mappingsOG = {
         ancestors: {
             type: 'keyword',
         },
+        source: {
+            type: 'keyword',
+            normalizer: 'my_normalizer',
+        },
         status: {
             type: 'keyword',
         },
@@ -59,10 +67,15 @@ const mappingsOG = {
         updatedAt: {
             type: 'date',
         },
+        diPrefix: {
+            type: 'keyword',
+        },
+
+        // TO DO: remove it after noam finishes
         directEntities: {
             enabled: false,
         },
-        directRoles: {
+        directRole: {
             enabled: false,
         },
     },

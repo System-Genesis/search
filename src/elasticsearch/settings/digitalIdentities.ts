@@ -1,11 +1,12 @@
 /* eslint-disable camelcase */
 import config from '../../config/index';
 import { IndexSettings } from './indexSettings';
-import { analyzers, tokenizers, prefix_autocomplete_field_settings } from './generalSettings';
+import { analyzers, tokenizersDI, prefix_autocomplete_field_settings, normalizers } from './generalSettings';
 
 const { fullTextFieldName } = config.elasticsearch;
 const { autocomplete, autocomplete_search, path_hierarchy } = analyzers;
-const { edge_ngram_tokenizer, custom_path_hierarchy } = tokenizers;
+const { my_normalizer } = normalizers;
+const { edge_ngram_tokenizer, custom_path_hierarchy } = tokenizersDI;
 
 const settings = {
     analysis: {
@@ -13,6 +14,9 @@ const settings = {
             autocomplete,
             autocomplete_search,
             path_hierarchy,
+        },
+        normalizer: {
+            my_normalizer,
         },
         tokenizer: {
             edge_ngram_tokenizer,
@@ -25,15 +29,22 @@ const DImappings = {
     properties: {
         type: {
             type: 'keyword',
+            normalizer: 'my_normalizer',
         },
         source: {
             type: 'keyword',
+            normalizer: 'my_normalizer',
         },
         mail: {
             type: 'keyword',
+            normalizer: 'my_normalizer',
+            fields: {
+                [fullTextFieldName]: prefix_autocomplete_field_settings,
+            },
         },
         uniqueId: {
             type: 'keyword',
+            normalizer: 'my_normalizer',
             fields: {
                 [fullTextFieldName]: prefix_autocomplete_field_settings,
             },
@@ -49,6 +60,9 @@ const DImappings = {
         },
         isRoleAttachable: {
             type: 'boolean',
+        },
+        upn: {
+            type: 'keyword',
         },
         role: {
             properties: {

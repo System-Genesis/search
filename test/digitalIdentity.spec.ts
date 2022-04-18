@@ -4,20 +4,18 @@
 import * as request from 'supertest';
 import * as qs from 'qs';
 import Server from '../src/express/server';
-import config from '../src/config/index';
 
-const { service } = config;
 
 export let server: Server;
 
 beforeAll(async () => {
-    server = new Server(service.port);
+    server = new Server(3005);
     console.log('Starting server...');
     try {
         await server.start();
-    } catch (err) {}
+    } catch (err) { console.log(err.message) }
 
-    console.log(`Server started on port: ${service.port}`);
+    console.log(`Server started on port: 3005`);
 });
 afterAll(async () => {
     await server.close();
@@ -28,7 +26,7 @@ describe('GET /search with ', () => {
             .get(`/api/digitalIdentities/search`)
             .query(
                 qs.stringify({
-                    ruleFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['mir_name', 'es_name', 'city_name'] }],
+                    ruleFilters: [{ field: 'source', entityType: 'digitalIdentity', values: ['mir_name', 'es_name'] }],
                     uniqueId: 'e208',
                 }),
             )
@@ -55,38 +53,6 @@ describe('GET /search with ', () => {
                                 },
                             ],
                         },
-                        {
-                            type: 'domUser',
-                            source: 'city_name',
-                            uniqueId: 'e205715386@city.com',
-                            isRoleAttachable: true,
-                            entityId: 14,
-                            role: [
-                                {
-                                    hierarchyIds: [],
-                                    roleId: 'e205715386@city',
-                                    jobTitle: 'Customer Applications Planner',
-                                    hierarchy: 'city_name/interstellar/vero/ea/consequuntur/accusamus',
-                                    source: 'city_name',
-                                },
-                            ],
-                        },
-                        {
-                            type: 'domUser',
-                            source: 'city_name',
-                            uniqueId: 'e308261638@city.com',
-                            isRoleAttachable: true,
-                            entityId: 248,
-                            role: [],
-                        },
-                        {
-                            type: 'digUser',
-                            source: 'mir_name',
-                            uniqueId: 'e286444822@city.com',
-                            isRoleAttachable: false,
-                            entityId: 34,
-                            role: [],
-                        },
                     ].toString(),
                 );
                 return done();
@@ -97,8 +63,8 @@ describe('GET /search with ', () => {
             .get(`/api/digitalIdentities/search`)
             .query(
                 qs.stringify({
-                    ruleFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['mir_name', 'es_name', 'city_name'] }],
-                    uniqueId: 'e208',
+                    ruleFilters: [{ field: 'source', entityType: 'digitalIdentity', values: ['es_name', 'city_name'] }],
+                    uniqueId: 'e286',
                     source: 'mir_name',
                 }),
             )
@@ -127,8 +93,9 @@ describe('GET /search with ', () => {
             .get(`/api/digitalIdentities/search`)
             .query(
                 qs.stringify({
-                    ruleFilters: [{ field: 'source', entityType: 'Digital Identity', values: ['!mir_name', 'es_name', 'city_name'] }],
+                    ruleFilters: [{ field: 'source', entityType: 'digitalIdentity', values: ['mir_name'] }],
                     uniqueId: 'e208',
+                    source: ['es_name', 'city_name'],
                 }),
             )
             .expect(200)
@@ -154,30 +121,8 @@ describe('GET /search with ', () => {
                                 },
                             ],
                         },
-                        {
-                            type: 'domUser',
-                            source: 'city_name',
-                            uniqueId: 'e205715386@city.com',
-                            isRoleAttachable: true,
-                            entityId: 14,
-                            role: [
-                                {
-                                    hierarchyIds: [],
-                                    roleId: 'e205715386@city',
-                                    jobTitle: 'Customer Applications Planner',
-                                    hierarchy: 'city_name/interstellar/vero/ea/consequuntur/accusamus',
-                                    source: 'city_name',
-                                },
-                            ],
-                        },
-                        {
-                            type: 'domUser',
-                            source: 'city_name',
-                            uniqueId: 'e308261638@city.com',
-                            isRoleAttachable: true,
-                            entityId: 248,
-                            role: [],
-                        },
+
+
                     ].toString(),
                 );
                 return done();

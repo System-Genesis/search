@@ -52,7 +52,6 @@ const { defaultResultLimit } = config.elasticsearch;
 const defaultQueryConfig: QueryConfig = {
     resultSize: defaultResultLimit,
 };
-// k.
 export abstract class ElasticSearchBaseRepository<T> {
     protected _client: Client;
 
@@ -60,18 +59,39 @@ export abstract class ElasticSearchBaseRepository<T> {
 
     protected _indexName: string;
 
-    constructor(indexName: string, elasticClient: Client = defaultEsClient, queryConfig: QueryConfig = defaultQueryConfig) {
+    protected _excludedFields: string[];
+
+    protected _hiddenFields: string[];
+
+    constructor(
+        indexName: string,
+        elasticClient: Client = defaultEsClient,
+        queryConfig: QueryConfig = defaultQueryConfig,
+        excludedFields: string[] = [],
+        hiddenFields: string[] = [],
+    ) {
         this._indexName = indexName;
         this._client = elasticClient;
         this._queryConfig = queryConfig;
+        this._excludedFields = excludedFields;
+        this._hiddenFields = hiddenFields;
     }
 
-    protected async search(query: Object, size: number = this._queryConfig.resultSize) {
+    public get excludedFields(): string[] {
+        return this._excludedFields;
+    }
+
+    public get hiddenFields(): string[] {
+        return this._hiddenFields;
+    }
+
+    protected async search(query?: Object, size: number = this._queryConfig.resultSize) {
         const res: ApiResponse<SearchResponse<T>> = await this._client.search({
             size,
             body: query,
             index: this._indexName,
         });
+        // TODO (RN): consider error handling instead of empty array (?)
         if (res.statusCode === 200) {
             return res.body.hits.hits.map((hit) => hit._source);
         }
