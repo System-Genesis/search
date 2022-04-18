@@ -153,7 +153,7 @@ describe('GET /search with ', () => {
     it('name and hierarchy and is underGroupId is valid, should return groups and 200', async (done) => {
         request(server.app)
             .get(`/api/groups/search`)
-            .query(qs.stringify({ name: 'ha', hierarchy: 'wall', underGroupId: ['1'], heyyy: 'haha' }))
+            .query(qs.stringify({ name: 'ha', hierarchy: 'wall', underGroupId: ['1'] }))
             .expect(200)
             .end((err, res) => {
                 if (err) {

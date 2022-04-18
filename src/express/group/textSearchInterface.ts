@@ -1,4 +1,4 @@
-import { FilterQueries } from '../../types';
+import { FilterQueries } from '../../utils/types';
 import { IOrganizationGroup } from './interface';
 
 export type GroupQuery = {
@@ -9,7 +9,8 @@ export type GroupQuery = {
 
 export type GroupFilters = {
     underGroupId: string[];
-    status: [];
+    isAlive: boolean[];
+    status: string[];
     expanded: boolean[];
     source: string[];
 };
@@ -21,9 +22,10 @@ export const groupMapFieldType: Map<string, Map<string, string>> = new Map<strin
     ['source', new Map<string, string>([['group', 'source']])],
 ]);
 
+// TODO (RN) - perhaps extract the following interface to a repo interface that doesn't depend on elastic
 export interface OrganizationGroupTextSearch {
     searchByNameAndHierarchy(
         nameAndHierarchyQuery: Partial<GroupQuery>,
-        filters?: FilterQueries<Partial<GroupFilters>>,
+        filters: FilterQueries<Partial<GroupFilters>>,
     ): Promise<IOrganizationGroup[]>;
 }

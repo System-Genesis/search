@@ -139,7 +139,7 @@ describe('GET /search with ', () => {
             .get(`/api/entities/search`)
             .query(
                 qs.stringify({
-                    'digitalIdentities.source': ['city_name', 'es_name'],
+                    'digitalIdentity.source': ['city_name', 'es_name'],
                     rank: 'ultimate',
                     ruleFilters: [{ field: 'source', values: ['city_name'], entityType: 'digitalIdentity' }],
                     fullName: 'ma',
@@ -195,7 +195,7 @@ describe('GET /search with ', () => {
             .get(`/api/entities/search`)
             .query(
                 qs.stringify({
-                    'digitalIdentities.source': ['city_name', 'es_name'],
+                    'digitalIdentity.source': ['city_name', 'es_name'],
                     rank: 'ultimated',
                     ruleFilters: [{ field: 'source', values: ['city_name'], entityType: 'digitalIdentity' }],
                     fullName: 'ma',

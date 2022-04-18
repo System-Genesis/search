@@ -4,7 +4,7 @@ import { Client } from '@elastic/elasticsearch';
 import config from '../../config';
 import { buildQueryGroup } from '../../elasticsearch';
 import { ElasticSearchBaseRepository, QueryConfig } from '../../elasticsearch/elasticSearchBaseRepository';
-import { FilterQueries } from '../../types';
+import { FilterQueries } from '../../utils/types';
 import { IOrganizationGroup } from './interface';
 import { GroupFilters, GroupQuery, OrganizationGroupTextSearch } from './textSearchInterface';
 

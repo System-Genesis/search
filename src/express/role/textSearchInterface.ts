@@ -1,4 +1,4 @@
-import { FilterQueries } from '../../types';
+import { FilterQueries } from '../../utils/types';
 import { IRole } from './interface';
 
 export type RoleFilters = {
@@ -10,7 +10,7 @@ export type RoleFilters = {
 };
 
 export interface RoleTextSearch {
-    searchByFullName(roleId: string, filters?: FilterQueries<Partial<RoleFilters>>): Promise<IRole[]>;
+    searchByRoleId(roleId: string, filters?: FilterQueries<Partial<RoleFilters>>): Promise<IRole[]>;
 }
 export const roleMapFieldType: Map<string, Map<string, string>> = new Map<string, Map<string, string>>([
     ['jobTitle', new Map<string, string>([['role', 'jobTitle']])],

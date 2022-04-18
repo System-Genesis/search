@@ -33,6 +33,6 @@ module.exports = {
                 json: 'never',
             },
         ],
-        'no-unused-vars': 'off', // Checked by typescript
+        'no-unused-vars': 'off',
     },
 };
