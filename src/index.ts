@@ -2,7 +2,6 @@ import Server from './express/server';
 import { initializeRabbit } from './rabbit/index';
 import config from './config';
 import { deleteElasticData, initElasticIndexes, readJsonAndWriteElastic } from './elasticsearch';
-import { initializeRabbit } from './rabbit';
 
 const { service } = config;
 
