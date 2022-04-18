@@ -10,7 +10,7 @@ import { sendToLogger } from '../../rabbit';
 export class ElasticEntityController {
     static async searchByFullname(req: Request, res: Response) {
         const reqFilters = req.query;
-        let { fullName, ruleFilters, ...userFilterss } = reqFilters;
+        let { fullName, uniqueId, ruleFilters, ...userFilterss } = reqFilters;
         const userFilters: Partial<EntityFilters> = transformQueryToUserFilters(userFilterss);
 
         try {

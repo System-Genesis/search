@@ -66,9 +66,21 @@ export const EntityFilters = Joi.object({
     hierarchyPath: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
 });
 
+export const validateOneExistence = Joi.object({
+    query: {
+        fullName: Joi.string().min(2),
+        uniqueId: Joi.when('fullName', {
+            is: Joi.string().min(2).exist(),
+            then: Joi.forbidden(),
+            otherwise: Joi.string().min(2).required(),
+        }),
+    },
+});
+
 export const getSearchRequestSchema = Joi.object({
     query: {
-        fullName: Joi.string().required().min(2),
+        fullName: Joi.string().min(2),
+        uniqueId: Joi.string().min(2),
         ruleFilters: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         status: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
         entityType: Joi.alternatives().try(Joi.array(), Joi.string()).allow(Joi.array().length(0)),
@@ -81,7 +93,7 @@ export const getSearchRequestSchema = Joi.object({
         expanded: Joi.alternatives().try(Joi.array(), Joi.string(), Joi.boolean()).allow(Joi.array().length(0)),
         underGroupId: Joi.alternatives().try(Joi.array(), Joi.bool()).allow(Joi.array().length(0)),
     },
-});
+}).or('query.fullName', 'query.uniqueId');
 
 export const getPostRequestSchema = Joi.object({
     body: Joi.alternatives().try(Joi.array().items(EntitySchema), EntitySchema),
