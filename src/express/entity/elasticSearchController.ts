@@ -23,7 +23,12 @@ export class ElasticEntityController {
             userFilters,
             entityMapFieldType,
         );
-        const response = await ElasticEntityRepository.searchByFullName(fullName!.toString(), filteredObject);
+        let response: IEntity[] = [];
+        if (fullName) {
+            response = await ElasticEntityRepository.searchByFullName(fullName.toString(), filteredObject);
+        } else {
+            response = await ElasticEntityRepository.searchByDi(uniqueId!.toString(), filteredObject);
+        }
         ResponseHandler.success<EntityDTO[]>(res, response);
     }
 

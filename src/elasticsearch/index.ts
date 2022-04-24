@@ -139,15 +139,21 @@ export const buildQuery = (
  * @returns The closest digital identitiy that belongs to the uniqueId with the excluded fields, filters and rules specified,
  * if the uniqueId does not have a domain it`s prioritized to the exact uniqueId with different domains.
  */
-export const buildQueryDI = (uniqueId: string, filters: FilterQueries<Partial<DigitalIdentityFilters>>, excludedFields: string[]): object => {
+export const buildQueryDI = (
+    uniqueId: string,
+    filters: FilterQueries<Partial<DigitalIdentityFilters | EntityFilters>>,
+    excludedFields: string[],
+    hiddenFields: string[] = [],
+    fieldName: string,
+): object => {
     const must: esb.Query[] = [];
     const should: esb.Query[] = [];
     const filter: esb.Query[] = [];
     const mustNot: esb.Query[] = [];
     let isExpanded = false;
 
-    must.push(esb.prefixQuery('uniqueId', uniqueId));
-    should.push(esb.queryStringQuery(`${uniqueId}@*`).field('uniqueId'));
+    must.push(esb.prefixQuery(fieldName, uniqueId));
+    should.push(esb.queryStringQuery(`${uniqueId}@*`).field(fieldName));
     for (const key in filters.userFilters) {
         if (key === 'expanded') {
             if (filters!.userFilters[key]?.includes(true)) {
@@ -176,7 +182,7 @@ export const buildQueryDI = (uniqueId: string, filters: FilterQueries<Partial<Di
     const requestBody = esb
         .requestBodySearch()
         .query(esb.boolQuery().mustNot(mustNot).must(must).should(should).filter(filter).minimumShouldMatch(0))
-        .source({ excludes: !isExpanded ? excludedFields : [] })
+        .source({ excludes: !isExpanded ? excludedFields.concat(hiddenFields) : hiddenFields })
         .toJSON();
     return requestBody;
 };

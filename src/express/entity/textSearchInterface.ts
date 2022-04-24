@@ -37,4 +37,5 @@ export const entityMapFieldType: Map<string, Map<string, string>> = new Map<stri
 
 export interface EntityTextSearch {
     searchByFullName(fullName: string, filters?: FilterQueries<Partial<EntityFilters>>): Promise<IEntity[]>;
+    searchByDi(uniqueId: string, filters?: FilterQueries<Partial<EntityFilters>>): Promise<IEntity[]>;
 }
