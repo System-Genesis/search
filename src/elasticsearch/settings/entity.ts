@@ -103,6 +103,9 @@ const entityMappings = {
         clearance: {
             enabled: false,
         },
+        fullClearance: {
+            enabled: false,
+        },
         pictures: {
             properties: {
                 profile: {

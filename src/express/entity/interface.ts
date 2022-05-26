@@ -38,6 +38,7 @@ interface IEntity {
     mobilePhone: string[];
     address: string;
     clearance: string;
+    fullClearance: string;
     sex?: string;
     birthDate?: Date;
     createdAt?: Date;
