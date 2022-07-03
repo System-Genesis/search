@@ -10,8 +10,9 @@ import { EntityDTO } from './dto';
 
 export class ElasticEntityController {
     static async searchByFullname(req: Request, res: Response) {
-        let { fullName, ruleFilters, ...userFiltersQuery } = req.query;
-        const userFilters: Partial<EntityFilters> = transformQueryToUserFilters<EntityFilters>(userFiltersQuery);
+        const reqFilters = req.query;
+        let { fullName, uniqueId, ruleFilters, ...userFilterss } = reqFilters;
+        const userFilters: Partial<EntityFilters> = transformQueryToUserFilters(userFilterss);
 
         // TODO (RN) - Is it relevant now? leftover from querystring?
         if (typeof ruleFilters === 'string') {
@@ -22,7 +23,12 @@ export class ElasticEntityController {
             userFilters,
             entityMapFieldType,
         );
-        const response = await ElasticEntityRepository.searchByFullName(fullName!.toString(), filteredObject);
+        let response: IEntity[] = [];
+        if (fullName) {
+            response = await ElasticEntityRepository.searchByFullName(fullName.toString(), filteredObject);
+        } else {
+            response = await ElasticEntityRepository.searchByDi(uniqueId!.toString(), filteredObject);
+        }
         ResponseHandler.success<EntityDTO[]>(res, response);
     }
 

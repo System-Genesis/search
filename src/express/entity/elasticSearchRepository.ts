@@ -4,7 +4,7 @@ import { Client } from '@elastic/elasticsearch';
 import config from '../../config';
 import { ElasticSearchBaseRepository, QueryConfig } from '../../elasticsearch/elasticSearchBaseRepository';
 import { EntityFilters, EntityTextSearch } from './textSearchInterface';
-import { buildQuery } from '../../elasticsearch/index';
+import { buildQuery, buildQueryDI } from '../../elasticsearch/index';
 import { FilterQueries } from '../../utils/types';
 import { IEntity } from './interface';
 
@@ -22,6 +22,10 @@ class ElasticEntityRepository extends ElasticSearchBaseRepository<IEntity> imple
 
     async searchByFullName(fullName: string, filters: FilterQueries<Partial<EntityFilters>>) {
         return await this.search(buildQuery(fullName, filters, this.excludedFields, this.hiddenFields));
+    }
+
+    async searchByDi(fullName: string, filters: FilterQueries<Partial<EntityFilters>>) {
+        return await this.search(buildQueryDI(fullName, filters, this.excludedFields, this.hiddenFields, 'digitalIdentities.uniqueId'));
     }
 
     async insertElastic(entity: IEntity | IEntity[]): Promise<void> {

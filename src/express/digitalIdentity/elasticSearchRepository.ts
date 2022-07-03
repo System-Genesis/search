@@ -18,7 +18,7 @@ export class ElasticDIRepository extends ElasticSearchBaseRepository<IDigitalIde
     }
 
     async searchByUniqueId(uniqueId: string, filters: FilterQueries<Partial<DigitalIdentityFilters>>) {
-        return await this.search(buildQueryDI(uniqueId, filters, this.excludedFields));
+        return await this.search(buildQueryDI(uniqueId, filters, this.excludedFields, [], 'uniqueId'));
     }
 }
 
